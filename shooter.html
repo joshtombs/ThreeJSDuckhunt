@@ -166,8 +166,8 @@
           bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
           bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, 110);
           bird.velocity = {
-            x: Math.random()*(1-0.3)+0.3
-            // y: Math.random()/10
+            x: randomNum(0.3,1),
+            y: 0.3
           }
           birds.push(bird);
           scene.add(bird);
@@ -262,7 +262,7 @@
           }
           else {
             birds[i].position.x += birds[i].velocity.x;             
-            // birds[i].position.y += birds[i].velocity.y * Math.floor(Math.random()*2+1);
+            birds[i].position.y += birds[i].velocity.y;
           }
         }
       }
