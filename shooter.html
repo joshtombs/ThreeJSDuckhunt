@@ -15,10 +15,28 @@
         font-family:georgia;
         text-align:center;
       }
+      .scoreboard{
+        position: absolute;
+        bottom: 50px;
+        right: 30px;
+        height:130px;
+        width:300px;
+        color: black;
+        background-color: white;
+      }
+      #score{
+        font-size:40px;
+      }
     </style>
   </head>
 
   <body>
+    <div class='scoreboard'>
+      <h3 id='playername'>Player Name</h3>
+      <p>Score:
+        <span id='score'></span>
+      </p>
+    </div>
     <script src="js/three.min.js"></script>    
     <script src="js/Detector.js"></script>
 
@@ -27,6 +45,7 @@
       window.app.vertLook = 0.5;
       window.app.horzLook = 0.5;
       window.app.skyColor = 0x6E91FF;
+      window.app.playerScore = 0;
       var mouse = new THREE.Vector3();
       var projector = new THREE.Projector();
       var camera, scene, renderer, mesh, levels = [];
@@ -41,6 +60,7 @@
         camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
         camera.position.set( 0, 50, 205 );
         createScenery();
+        generateScoreBoard();
         generateGun();
         generateBirds();
         renderer = new THREE.WebGLRenderer();
@@ -86,6 +106,15 @@
         scene.add(sunsphere);
       }
 
+      function generateScoreBoard(){
+        window.app.Score = window.document.getElementById('score');
+        app.Score.innerHTML = app.playerScore;
+      }
+
+      function updateScoreBoard(){
+        app.Score.innerHTML = app.playerScore;
+      }
+
       function generateBirds(){
         window.numBirds = 25;
         window.birds = [];
@@ -128,8 +157,8 @@
         if ( intersects.length > 0 ) {
           deadBirds.push(intersects[0].object);
           scene.remove(intersects[0].object)
+          app.playerScore++;
         }
-        console.log(deadBirds);        
       }
       
       function onMouseUp(e){
@@ -171,12 +200,11 @@
         Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
         Gun.rotateY(0);
         flyBirds();
-
+        updateScoreBoard();
         renderer.render( scene, camera );
 
       }
 
     </script>
-
   </body>
 </html>
