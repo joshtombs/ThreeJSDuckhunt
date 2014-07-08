@@ -63,6 +63,7 @@
       window.app.player.score = 0;
       window.app.player.name = 'Player Name';
       window.app.player.shotsLeft = 6;
+      window.bird = {};
       var mouse = new THREE.Vector3();
       var projector = new THREE.Projector();
       var camera, scene, renderer, mesh, levels = [];
@@ -79,7 +80,7 @@
         createScenery();
         generateScoreBoard();
         generateGun();
-        generateBirds();
+        generateBird();
         renderer = new THREE.WebGLRenderer();
         renderer.sortObjects = false;
         renderer.setClearColor( 0x7ec0ee );
@@ -157,21 +158,14 @@
         app.Shots.innerHTML = app.player.shotsLeft;
       }
 
-      function generateBirds(){
-        window.numBirds = 25;
-        window.birds = [];
-        window.deadBirds = [];
-        var bird;
-        for( var i = 0; i < window.numBirds; i++){
-          bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
-          bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, 110);
-          bird.velocity = {
-            x: randomNum(0.3,1),
-            y: 0.3
-          }
-          birds.push(bird);
-          scene.add(bird);
+      function generateBird(){
+        bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
+        bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, 110);
+        bird.velocity = {
+          x: 0,
+          y: 0.3
         }
+        scene.add(bird);
       }
 
       function generateGun(){
@@ -189,7 +183,7 @@
         mouse.y = 1 - 2 * (e.clientY / window.innerHeight);
 
         var raycaster = projector.pickingRay( mouse.clone(), camera );
-        window.intersects = raycaster.intersectObjects( birds );
+        window.intersects = raycaster.intersectObject( bird );
 
         document.body.style.cursor = 'crosshair';
       }
@@ -202,12 +196,13 @@
         flash();
         app.player.shotsLeft--;
         if(app.player.shotsLeft == 0){
-          setTimeout(function(){app.player.reload()}, 3000);
+          setTimeout(function(){app.player.reload()}, 2500);
         }
-        if ( intersects.length > 0 ) {
-          deadBirds.push(intersects[0].object);
-          scene.remove(intersects[0].object)
+      kill:   
+      if ( intersects.length > 0 ) {
           app.player.score++;
+          scene.remove(intersects[0].object);
+          setTimeout(function(){generateBird()},500);
         }
       }
       
@@ -221,6 +216,7 @@
         return num;
 
       app.player.reload = function(){
+
         app.player.shotsLeft = 6;
       }
 
@@ -243,17 +239,22 @@
         render();
       }
 
-      function flyBirds(){
-        for(var i = 0; i < window.birds.length; i++) {
-          if(birds[i].position.x > (window.innerWidth / 10)) {
-            birds[i].position.x = (-window.innerWidth / 10);            
-          }
-          else {
-            birds[i].position.x += birds[i].velocity.x;             
-            birds[i].position.y += birds[i].velocity.y;
-          }
+      function flyBird(){
+
+        if(bird.position.y > (window.innerHeight / 10)) {
+          outOfView(bird);
+        }
+        else {
+          bird.position.x += bird.velocity.x;             
+          bird.position.y += bird.velocity.y;
         }
       }
+
+      function outOfView(bird){
+        scene.remove(bird);
+        generateBird();
+      }
+
       function render() {
 
         var time = Date.now() / 6000;
@@ -264,8 +265,9 @@
         Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
         Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
         Gun.rotateY(0);
-        flyBirds();
+        
         updateScoreBoard();
+        flyBird();
         renderer.render( scene, camera );
 
       }
