@@ -24,6 +24,17 @@
         color: black;
         background-color: white;
       }
+      .shotsleft{
+        float:left;
+        width:149px;
+      }
+      #shotsleft{
+        font-size:40px;
+      }
+      .score{
+        float:right;
+        width:149px;
+      }
       #score{
         font-size:40px;
       }
@@ -33,7 +44,10 @@
   <body>
     <div class='scoreboard'>
       <h3 id='playername'>Player Name</h3>
-      <p>Score:
+      <p class='shotsleft'>Shots:
+        <span id='shotsleft'></span>
+      </p>
+      <p class='score'>Score:
         <span id='score'></span>
       </p>
     </div>
@@ -42,10 +56,13 @@
 
     <script>
       window.app = {};
+      window.app.player = {};
       window.app.vertLook = 0.5;
       window.app.horzLook = 0.5;
       window.app.skyColor = 0x6E91FF;
-      window.app.playerScore = 0;
+      window.app.player.score = 0;
+      window.app.player.name = 'Player Name';
+      window.app.player.shotsLeft = 6;
       var mouse = new THREE.Vector3();
       var projector = new THREE.Projector();
       var camera, scene, renderer, mesh, levels = [];
@@ -107,12 +124,16 @@
       }
 
       function generateScoreBoard(){
+        window.app.Shots = window.document.getElementById('shotsleft');
+        app.Shots.innerHTML = app.player.shotsLeft;
         window.app.Score = window.document.getElementById('score');
-        app.Score.innerHTML = app.playerScore;
+        app.Score.innerHTML = app.player.score;
+        window.document.getElementById('playername').innerHTML = window.app.player.name;
       }
 
       function updateScoreBoard(){
-        app.Score.innerHTML = app.playerScore;
+        app.Score.innerHTML = app.player.score;
+        app.Shots.innerHTML = app.player.shotsLeft;
       }
 
       function generateBirds(){
@@ -154,10 +175,18 @@
       
       function onMouseDown(e){
         e.preventDefault();
+        if(app.player.shotsLeft == 0)
+          return
+        document.body.style.cursor = 'crosshair';
+        flash();
+        app.player.shotsLeft--;
+        if(app.player.shotsLeft == 0){
+          setTimeout(function(){app.player.reload()}, 3000);
+        }
         if ( intersects.length > 0 ) {
           deadBirds.push(intersects[0].object);
           scene.remove(intersects[0].object)
-          app.playerScore++;
+          app.player.score++;
         }
       }
       
@@ -169,6 +198,18 @@
       function randomNum(min, max){
         var num = Math.random()*(max-min+1) + min;
         return num;
+
+      app.player.reload = function(){
+        app.player.shotsLeft = 6;
+      }
+
+      function flash(){
+        // var flash = new THREE.PointLight(0xFF0000, 1000);
+        // flash.position.set(camera.position.x, camera.position.y, camera.position.z +30);
+        // scene.add(flash);
+        // setTimeout(function(){scene.remove(flash)},1000);
+        var flashColor = 1;
+        colorifyPass.uniforms["color"].value.setRGB(flashColor, flashColor, flashColor);
       }
 
       //
