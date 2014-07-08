@@ -204,12 +204,14 @@
       }
 
       function flash(){
-        // var flash = new THREE.PointLight(0xFF0000, 1000);
-        // flash.position.set(camera.position.x, camera.position.y, camera.position.z +30);
-        // scene.add(flash);
-        // setTimeout(function(){scene.remove(flash)},1000);
-        var flashColor = 1;
-        colorifyPass.uniforms["color"].value.setRGB(flashColor, flashColor, flashColor);
+        var flash = new THREE.AmbientLight(0xFFFFFF,10);
+        scene.add(flash);
+        setTimeout(function(){scene.remove(flash)},70);
+      }
+
+      function randomNum(min, max){
+        var num = Math.random()*(max-min+1) + min;
+        return num;
       }
 
       //
