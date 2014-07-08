@@ -107,8 +107,10 @@
         scene.add(skyPlane);
         DrawGrass();
         DrawSun();
-
+        DrawBushes();
+        DrawTrees();
       }
+
       function DrawGrass(){
           var newplane = new THREE.Mesh( new THREE.PlaneGeometry(window.innerWidth,255), new THREE.MeshLambertMaterial({color: 0x003300}));
           newplane.position.z +=30;
@@ -122,6 +124,25 @@
         sunsphere.position.z=-200;
         scene.add(sunsphere);
       }
+
+      function DrawBushes(){
+        var bush;
+        for(var i = 0; i < 20; i++){
+          bush = new THREE.Mesh(new THREE.BoxGeometry(20,8,10), new THREE.MeshLambertMaterial({color:0x002000}));
+          bush.position.set((20*i -200),30,140);
+          scene.add(bush);
+        }
+      }
+
+      function DrawTrees(){
+        var tree;
+        var numTrees = randomNum(2,4);
+        for(var i = 1; i < numTrees; i++){
+          tree = new THREE.Mesh(new THREE.BoxGeometry(10,randomNum(30,90),10), new THREE.MeshLambertMaterial({color:0x0987143}));
+          tree.position.set(randomNum(-100,100),30,10);
+          scene.add(tree);
+        }
+       }
 
       function generateScoreBoard(){
         window.app.Shots = window.document.getElementById('shotsleft');
