@@ -93,7 +93,7 @@
         var bird;
         for( var i = 0; i < window.numBirds; i++){
           bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
-          bird.position.set(40, Math.floor(Math.random() * (70-40)+40),Math.floor(Math.random() * (110-60)+60));
+          bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, 110);
           bird.velocity = {
             x: Math.random()*(1-0.3)+0.3
             // y: Math.random()/10
@@ -104,8 +104,8 @@
       }
 
       function generateGun(){
-        var gun = new THREE.Mesh( new THREE.BoxGeometry(40,5,5), new THREE.MeshLambertMaterial({color:'brown'}));
-        gun.position.set(0,40,170);
+        var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:'brown'}));
+        gun.position.set(0,40,190);
         window.Gun = gun;
         scene.add(gun);
       }
@@ -134,8 +134,13 @@
       
       function onMouseUp(e){
         e.preventDefault();
+        document.body.style.cursor = 'crosshair';
       }
 
+      function randomNum(min, max){
+        var num = Math.random()*(max-min+1) + min;
+        return num;
+      }
 
       //
 
@@ -160,7 +165,7 @@
         var time = Date.now() / 6000;
 
         camera.lookAt( scene.position );
-        // camera.rotateX((1 - vertLook) *Math.PI/2)
+        // camera.rotateX((1 - app.vertLook) *Math.PI/2)
         Gun.lookAt( scene.position );
         Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
         Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
