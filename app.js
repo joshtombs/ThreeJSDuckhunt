@@ -7,6 +7,7 @@ window.app.player.score = 0;
 window.app.player.name = 'Player Name';
 window.app.player.shotsLeft = 6;
 window.bird = {};
+window.Gun = {};
 window.target = [];
 window.index = 0;
 window.levelstats = [[0.1,0.1,0,30,3],[0.1,0.1,0,50,4],[0.2,0.2,0.2,40,5],[0.3,0.3,0.2,50,6],[0.3,0.3,0.3,60,6],[0.4,0.4,0.3,60,6]];
@@ -16,6 +17,18 @@ window.duckIndex = 0;
 var mouse = new THREE.Vector3();
 var projector = new THREE.Projector();
 var camera, scene, renderer, mesh, levels = [];
+var moph, morphs = [];
+var clock = new THREE.Clock();
+window.app.player.reload = function(){
+
+  app.player.shotsLeft = 6;
+};
+
+
+
+window.bird.position = {};
+window.bird.position = {x:0,y:0,z:0}
+window.bird.velocity = {x:0,y:0,z:0}
 
 // if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -42,11 +55,51 @@ function init() {
   window.document.addEventListener("mousedown", onMouseDown);
   window.document.addEventListener("mouseup", onMouseUp);
 
+
+  // composer = new THREE.EffectComposer( renderer );
+  // composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+
+
+  // var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
+  // effect.uniforms[ 'amount' ].value = 0.002;
+  // effect.renderToScreen = true;
+  // composer.addPass( effect );
+
   // Here is the effect for the Oculus Rift
   // worldScale 100 means that 100 Units == 1m
   effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} );
   effect.setSize( window.innerWidth, window.innerHeight );
 }
+
+function addModelToScene( geometry, materials ){
+  var material = new THREE.MeshFaceMaterial( materials );
+  window.bird = new THREE.Mesh( geometry, material );
+  bird.scale.set(.3,.3,.3);
+  bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
+  bird.velocity = {
+    x: levelstats[level][0],
+    y: levelstats[level][1],
+    z: levelstats[level][2]
+  }
+  // morphColorsToFaceColors( geometry );
+  // addMorph( geometry, 250, 500, bird.position.x -500, 500, 700 ); 
+  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, -200 );
+  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 200 );
+  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 1000 );
+  scene.add( bird );
+}
+
+// function morphColorsToFaceColors( geometry ) {
+
+//   if ( geometry.morphColors && geometry.morphColors.length ) {
+//     var colorMap = geometry.morphColors[ 0 ];
+//     for ( var i = 0; i < colorMap.colors.length; i ++ ) {
+//       geometry.faces[ i ].color = colorMap.colors[ i ];
+//     }
+//   }
+// }
+
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -128,23 +181,43 @@ function generateDuckCounter(){
 }
 
 function generateBird(){
-  bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
-  bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
-  bird.velocity = {
-    x: levelstats[level][0],
-    y: levelstats[level][1],
-    z: levelstats[level][2]
-  }
-  scene.add(bird);
+  var jsonLoader = new THREE.JSONLoader();  
+  jsonLoader.load( "parrot.js", addModelToScene );
+
+  // bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
+  // bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
+  // bird.velocity = {
+  //   x: levelstats[level][0],
+  //   y: levelstats[level][1],
+  //   z: levelstats[level][2]
+  // }
+  // scene.add(bird);
   index = 0;
   generatePath();
 }
 
 function generateGun(){
-  var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
-  gun.position.set(0,40,190);
-  window.Gun = gun;
-  scene.add(gun);
+  var jsonLoader = new THREE.JSONLoader();  
+  jsonLoader.load( "weapon-light.js", addGunToScene );
+
+  // var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
+  // gun.position.set(0,40,190);
+  // window.Gun = gun;
+  // scene.add(gun);
+}
+
+function addGunToScene( geometry, materials ){
+  var material = new THREE.MeshFaceMaterial( materials );
+  window.Gun = new THREE.Mesh( geometry, material );
+  Gun.scale.set(3,3,3);
+  Gun.position.set(0,-10,110);
+  Gun.rotateY(-50);
+  // morphColorsToFaceColors( geometry );
+  // addMorph( geometry, 250, 500, bird.position.x -500, 500, 700 ); 
+  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, -200 );
+  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 200 );
+  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 1000 );
+  scene.add( Gun );
 }
 
 function onMouseMove(e){
@@ -172,7 +245,6 @@ function onMouseDown(e){
   }
   if ( intersects.length > 0 ) {
     levelCounter++;
-    console.log(levelCounter);
     grayDuck(duckIndex);
     duckIndex--;
     app.player.score++;
@@ -191,11 +263,6 @@ function randomNum(min, max){
   return num;
 }
 
-app.player.reload = function(){
-
-  app.player.shotsLeft = 6;
-}
-
 function flash(){
   var flash = new THREE.AmbientLight(0xFFFFFF,10);
   scene.add(flash);
@@ -207,6 +274,30 @@ function animate() {
   render();
 }
 
+// function addMorph( geometry, speed, duration, x, y, z ) {
+
+//   var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
+
+//   var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+
+//   meshAnim.speed = speed;
+//   meshAnim.duration = duration;
+//   meshAnim.time = 600 * Math.random();
+
+//   meshAnim.position.set( x, y, z );
+//   meshAnim.rotation.y = Math.PI/2;
+
+//   meshAnim.castShadow = true;
+//   meshAnim.receiveShadow = false;
+
+//   scene.add( meshAnim );
+
+//   morphs.push( meshAnim );
+
+//   renderer.initWebGLObjects( scene );
+
+// }
+
 function flyBird(){
 
   if((bird.position.y > (window.innerHeight / 10)) || bird.position.x > (window.innerWidth / 10 || bird.position.x < (window.innerWidth/10))) {
@@ -217,9 +308,9 @@ function flyBird(){
       bird.position.x += bird.velocity.x;
     else if((bird.position.x > target[index][0])  && (Math.abs(bird.position.x - target[index][0]) > 1))
       bird.position.x -= bird.velocity.x;
-    if((bird.position.y < target[index][1]) && (Math.abs(bird.position.x - target[index][1]) > 1))
+    if((bird.position.y < target[index][1]) && (Math.abs(bird.position.x - target[index][1]) > .8))
       bird.position.y += bird.velocity.y;
-    else if((bird.position.y > target[index][1]) && (Math.abs(bird.position.y - target[index][1]) > 1))
+    else if((bird.position.y > target[index][1]) && (Math.abs(bird.position.y - target[index][1]) > .8))
       bird.position.y -= bird.velocity.y;
     if((bird.position.z < target[index][3]) && (Math.abs(bird.position.z - target[index][3]) > 1))
       bird.position.z += bird.velocity.z;
@@ -289,11 +380,17 @@ function grayDuck(ind){
 }
 
 function render() {
+  var delta = clock.getDelta();
   camera.lookAt( scene.position );
   // camera.rotateX((1 - app.vertLook) *Math.PI/2)
   Gun.lookAt( scene.position );
-  Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
-  Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
+  // Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
+  // Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
+  // Gun.rotateY(0);
+  Gun.rotateY(((app.horzLook)*-1) * Math.PI/2);
+  Gun.rotateZ((1 - 3*app.vertLook) * (Math.PI - 3)/2 );
+
+  // Gun.rotateZ()
   Gun.rotateY(0);
   updateScoreBoard();
 
@@ -302,6 +399,20 @@ function render() {
   flyBird();
   if( isNearTarget() )
     index++;
+  // for ( var i = 0; i < morphs.length; i ++ ) {
+
+  //   morph = morphs[ i ];
+
+  //   morph.updateAnimation( 1000 * delta );
+
+  //   morph.position.x += morph.speed * delta;
+
+  //   if ( morph.position.x  > 2000 )  {
+
+  //     morph.position.x = -1500 - Math.random() * 500;
+
+  //   }
+  // }
   renderer.render( scene, camera );
   // effect.render(scene, camera);
 
