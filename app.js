@@ -7,6 +7,10 @@ window.app.player.score = 0;
 window.app.player.name = 'Player Name';
 window.app.player.shotsLeft = 6;
 window.bird = {};
+window.target = [];
+window.index = 0;
+window.levelstats = [[0.1,20],[0.1,40],[0.2,30],[0.3,40],[0.3,50],[0.4,50]];
+window.level = 0;
 var mouse = new THREE.Vector3();
 var projector = new THREE.Projector();
 var camera, scene, renderer, mesh, levels = [];
@@ -34,13 +38,19 @@ function init() {
   window.document.addEventListener("mousemove", onMouseMove);
   window.document.addEventListener("mousedown", onMouseDown);
   window.document.addEventListener("mouseup", onMouseUp);
+
+  // Here is the effect for the Oculus Rift
+  // worldScale 100 means that 100 Units == 1m
+  effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} );
+  effect.setSize( window.innerWidth, window.innerHeight );
 }
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize( window.innerWidth, window.innerHeight );
 
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  // effect.setSize( window.innerWidth, window.innerHeight );
 }
 
 function createScenery(){
@@ -94,25 +104,29 @@ function generateScoreBoard(){
   window.app.Score = window.document.getElementById('score');
   app.Score.innerHTML = app.player.score;
   window.document.getElementById('playername').innerHTML = window.app.player.name;
+  window.app.Level = window.document.getElementById('level');
+  app.Level.innerHTML = window.level + 1;
 }
 
 function updateScoreBoard(){
   app.Score.innerHTML = app.player.score;
   app.Shots.innerHTML = app.player.shotsLeft;
+  app.Level.innerHTML = window.level + 1;
 }
 
 function generateBird(){
   bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
   bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, 110);
   bird.velocity = {
-    x: 0,
-    y: 0.3
+    x: levelstats[level][0],
+    y: levelstats[level][0]
   }
   scene.add(bird);
+  generatePath();
 }
 
 function generateGun(){
-  var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:'brown'}));
+  var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
   gun.position.set(0,40,190);
   window.Gun = gun;
   scene.add(gun);
@@ -176,12 +190,41 @@ function animate() {
 
 function flyBird(){
 
-  if(bird.position.y > (window.innerHeight / 10)) {
+  if((bird.position.y > (window.innerHeight / 10)) || bird.position.x > (window.innerWidth / 10 || bird.position.x < (window.innerWidth/10))) {
     outOfView(bird);
   }
   else {
-    bird.position.x += bird.velocity.x;             
-    bird.position.y += bird.velocity.y;
+    if(bird.position.x < target[index][0] )
+      bird.position.x += bird.velocity.x;
+    else if(bird.position.x > target[index][0])
+      bird.position.x -= bird.velocity.x;
+    // else
+    //   console.log('Im HEEEEEEERE');
+    if(bird.position.y < target[index][1])
+      bird.position.y += bird.velocity.y;
+    else if(bird.position.y > target[index][1])
+      bird.position.y -= bird.velocity.y;
+    // else
+    //   console.log('Im Here tooo!');
+  }
+}
+
+function isNearTarget(){
+  if(((target[index][0] - bird.position.x) < 1)&&((target[index][1] - bird.position.y) < 1)){
+    console.log('near x');
+    return true
+  } 
+  else 
+    return false
+}
+
+function generatePath(){
+  b = 25;
+  var i = 0;
+  while(b < (window.innerHeight/10 + 20 )){
+    b += 10;
+    target[i] = [randomNum(bird.position.x - levelstats[level][1], bird.position.x + levelstats[level][1]), b];
+    i++;
   }
 }
 
@@ -190,10 +233,25 @@ function outOfView(bird){
   generateBird();
 }
 
+function updateLevel(){
+  if(app.player.score < 10){ 
+    level = 0;  
+  }
+  if(app.player.score >= 10 && app.player.score < 20){
+    level = 1;
+  }
+  if(app.player.score >= 20 && app.player.score < 30){
+    level = 2;
+  }
+  if(app.player.score >= 30 && app.player.score < 40){
+    level = 3;
+  }
+  if(app.player.score >= 40 && app.player.score < 50){
+    level = 4;
+  }
+}
+
 function render() {
-
-  var time = Date.now() / 6000;
-
   camera.lookAt( scene.position );
   // camera.rotateX((1 - app.vertLook) *Math.PI/2)
   Gun.lookAt( scene.position );
@@ -202,7 +260,11 @@ function render() {
   Gun.rotateY(0);
   
   updateScoreBoard();
+  updateLevel();
   flyBird();
+  if( isNearTarget() )
+    index++;
   renderer.render( scene, camera );
+  // effect.render(scene, camera);
 
 }

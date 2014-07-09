@@ -19,10 +19,16 @@
         position: absolute;
         bottom: 50px;
         right: 30px;
-        height:130px;
+        height:auto;
         width:300px;
         color: black;
         background-color: white;
+      }
+      .level{
+        text-align:center;
+      }
+      #level{
+        font-size:40px;
       }
       .shotsleft{
         float:left;
@@ -50,9 +56,14 @@
       <p class='score'>Score:
         <span id='score'></span>
       </p>
+      <p class='level'>Level:
+        <span id='level'></span>
+      </p>
+
     </div>
     <script src="js/three.min.js"></script>    
     <script src="js/Detector.js"></script>
+    <script src="js/effects/OculusRiftEffect.js"></script>
     <script src='app.js'></script>
   </body>
 </html>
