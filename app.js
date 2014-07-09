@@ -9,8 +9,10 @@ window.app.player.shotsLeft = 6;
 window.bird = {};
 window.target = [];
 window.index = 0;
-window.levelstats = [[0.1,20],[0.1,40],[0.2,30],[0.3,40],[0.3,50],[0.4,50]];
+window.levelstats = [[0.1,0.1,0,30,3],[0.1,0.1,0,50,4],[0.2,0.2,0.2,40,5],[0.3,0.3,0.2,50,6],[0.3,0.3,0.3,60,6],[0.4,0.4,0.3,60,6]];
 window.level = 0;
+window.levelCounter = 0;
+window.duckIndex = 0;
 var mouse = new THREE.Vector3();
 var projector = new THREE.Projector();
 var camera, scene, renderer, mesh, levels = [];
@@ -26,6 +28,7 @@ function init() {
   camera.position.set( 0, 50, 205 );
   createScenery();
   generateScoreBoard();
+  generateDuckCounter();
   generateGun();
   generateBird();
   renderer = new THREE.WebGLRenderer();
@@ -93,7 +96,7 @@ function DrawTrees(){
   var numTrees = randomNum(2,4);
   for(var i = 1; i < numTrees; i++){
     tree = new THREE.Mesh(new THREE.BoxGeometry(10,randomNum(30,90),10), new THREE.MeshLambertMaterial({color:0x0987143}));
-    tree.position.set(randomNum(-100,100),30,10);
+    tree.position.set(randomNum(-100,100),30,randomNum(0,80));
     scene.add(tree);
   }
  }
@@ -114,14 +117,26 @@ function updateScoreBoard(){
   app.Level.innerHTML = window.level + 1;
 }
 
+function generateDuckCounter(){
+  duckIndex = levelstats[level][4];
+  var dcounter = document.getElementsByClassName('duckcounter')[0];
+  dcounter.innerHTML = '';
+  for(var i = 0; i < duckIndex; i++){
+    dcounter.innerHTML += "<img src= 'images/duck.jpg' class='duckIMG' />"
+  }
+  // dcounter.innerHTML = 'Replaced';
+}
+
 function generateBird(){
   bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
-  bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, 110);
+  bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
   bird.velocity = {
     x: levelstats[level][0],
-    y: levelstats[level][0]
+    y: levelstats[level][1],
+    z: levelstats[level][2]
   }
   scene.add(bird);
+  index = 0;
   generatePath();
 }
 
@@ -156,6 +171,10 @@ function onMouseDown(e){
     setTimeout(function(){app.player.reload()}, 2500);
   }
   if ( intersects.length > 0 ) {
+    levelCounter++;
+    console.log(levelCounter);
+    grayDuck(duckIndex);
+    duckIndex--;
     app.player.score++;
     scene.remove(intersects[0].object);
     setTimeout(function(){generateBird()},500);
@@ -194,24 +213,23 @@ function flyBird(){
     outOfView(bird);
   }
   else {
-    if(bird.position.x < target[index][0] )
+    if((bird.position.x < target[index][0] ) && (Math.abs(bird.position.x - target[index][0]) > 1))
       bird.position.x += bird.velocity.x;
-    else if(bird.position.x > target[index][0])
+    else if((bird.position.x > target[index][0])  && (Math.abs(bird.position.x - target[index][0]) > 1))
       bird.position.x -= bird.velocity.x;
-    // else
-    //   console.log('Im HEEEEEEERE');
-    if(bird.position.y < target[index][1])
+    if((bird.position.y < target[index][1]) && (Math.abs(bird.position.x - target[index][1]) > 1))
       bird.position.y += bird.velocity.y;
-    else if(bird.position.y > target[index][1])
+    else if((bird.position.y > target[index][1]) && (Math.abs(bird.position.y - target[index][1]) > 1))
       bird.position.y -= bird.velocity.y;
-    // else
-    //   console.log('Im Here tooo!');
+    if((bird.position.z < target[index][3]) && (Math.abs(bird.position.z - target[index][3]) > 1))
+      bird.position.z += bird.velocity.z;
+    else if((bird.position.z > target[index][3])  && (Math.abs(bird.position.z - target[index][3]) > 1))
+      bird.position.z -= bird.velocity.z;
   }
 }
 
 function isNearTarget(){
-  if(((target[index][0] - bird.position.x) < 1)&&((target[index][1] - bird.position.y) < 1)){
-    console.log('near x');
+  if(((target[index][0] - bird.position.x) < 4)&&((target[index][1] - bird.position.y) < 1)){
     return true
   } 
   else 
@@ -222,8 +240,11 @@ function generatePath(){
   b = 25;
   var i = 0;
   while(b < (window.innerHeight/10 + 20 )){
-    b += 10;
-    target[i] = [randomNum(bird.position.x - levelstats[level][1], bird.position.x + levelstats[level][1]), b];
+    b += 5;
+    target[i] = [];
+    target[i][0] = randomNum(bird.position.x - levelstats[level][3], bird.position.x + levelstats[level][3]);
+    target[i][1] = randomNum(b - 10, b + 10);
+    target[i][2] = randomNum(60,120);
     i++;
   }
 }
@@ -231,24 +252,40 @@ function generatePath(){
 function outOfView(bird){
   scene.remove(bird);
   generateBird();
+  duckIndex--;
 }
 
 function updateLevel(){
-  if(app.player.score < 10){ 
-    level = 0;  
+  if(levelCounter == levelstats[level][4]){ 
+    level++;
+    levelCounter = 0;
+    app.skyColor = Math.random() * 0xFFFFFF;
+    createScenery();
+    generateGun();
+    generateDuckCounter();
   }
-  if(app.player.score >= 10 && app.player.score < 20){
-    level = 1;
+}
+
+function checkIndex(){
+  if(duckIndex == 0)
+    if( (levelstats[level][4] - levelCounter) > 0 )
+      findMissedBird();
+}
+
+function findMissedBird(){
+  var ducks = document.getElementsByTagName('img');
+  for(var i = 0 ; i >= levelstats[level][4] - 1; i++){
+    var b = ducks[i].src;
+    if( !(b.indexOf('gduck.jpg') > -1) ){
+      duckIndex = i;
+    }
   }
-  if(app.player.score >= 20 && app.player.score < 30){
-    level = 2;
-  }
-  if(app.player.score >= 30 && app.player.score < 40){
-    level = 3;
-  }
-  if(app.player.score >= 40 && app.player.score < 50){
-    level = 4;
-  }
+}
+
+function grayDuck(ind){
+  var ducks = document.getElementsByTagName('img');
+  var deadduck = ducks[ind - 1]
+  deadduck.src = 'images/gduck.jpg';
 }
 
 function render() {
@@ -258,8 +295,9 @@ function render() {
   Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
   Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
   Gun.rotateY(0);
-  
   updateScoreBoard();
+
+  checkIndex();
   updateLevel();
   flyBird();
   if( isNearTarget() )
