@@ -1,13 +1,9 @@
-window.app = {};
+window.app = window.app || {};
 window.idealwidth = window.innerWidth;
 window.idealHeight = idealwidth * (3/7);
-window.app.player = {};
 window.app.vertLook = 0.5;
 window.app.horzLook = 0.5;
 window.app.skyColor = 0x6E91FF;
-window.app.player.score = 0;
-window.app.player.name = 'Player Name';
-window.app.player.shotsLeft = 6;
 window.bird = {};
 window.bird.position = {};
 window.bird.position = {x:0,y:0,z:0};
@@ -24,10 +20,8 @@ var projector = new THREE.Projector();
 var camera, scene, renderer, mesh, levels = [];
 var moph, morphs = [];
 var clock = new THREE.Clock();
-window.app.player.reload = function(){
-  app.player.shotsLeft = 6;
-};
-
+var player = new app.Models.Player();
+console.log(player);
 
 // if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -106,7 +100,7 @@ function CreateTreeModel(){
     treeMesh = new THREE.Mesh( geometry, materialScene );
     treeMesh.position.set(randomNum(-100,100),10,randomNum(0,80));
 
-    var sc = 50;
+    var sc = randomNum(40,80);
     treeMesh.scale.set( sc, sc, sc );
 
     treeMesh.matrixAutoUpdate = false;
@@ -163,7 +157,7 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
 
   renderer.setSize( idealwidth, idealHeight );
-  // effect.setSize( idealwidth, idealHeight );
+  // effect.setSize( window.innerWidth, window.innerHeight );
 }
 
 function createScenery(){
@@ -173,8 +167,9 @@ function createScenery(){
   skytexture.wrapS = THREE.RepeatWrapping;
   skytexture.wrapT = THREE.RepeatWrapping;
   skytexture.repeat.set(0.7,0.3);
-  skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(idealwidth, idealHeight), new THREE.MeshBasicMaterial({color: app.skyColor, map: skytexture}));
+  skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * idealwidth, idealHeight), new THREE.MeshBasicMaterial({color: app.skyColor, map: skytexture}));
   skyPlane.position.z -= 150;
+  window.sky = skyPlane;
   scene.add(skyPlane);
   DrawGrass();
   DrawSun();
@@ -223,7 +218,7 @@ function DrawSun(){
   suntexture.wrapT = THREE.RepeatWrapping;
   suntexture.repeat.set(3,3);
 
-  var sunsphere = new THREE.Mesh( new THREE.SphereGeometry(100,100,100), new THREE.MeshLambertMaterial({color: 'yellow', map: suntexture}));
+  var sunsphere = new THREE.Mesh( new THREE.SphereGeometry(100,100,100), new THREE.MeshLambertMaterial({color: 'yellow'}));
   sunsphere.position.z=-200;
   scene.add(sunsphere);
 }
@@ -250,17 +245,17 @@ function DrawTrees(){
 
 function generateScoreBoard(){
   window.app.Shots = window.document.getElementById('shotsleft');
-  app.Shots.innerHTML = app.player.shotsLeft;
+  app.Shots.innerHTML = player.get('bullets');
   window.app.Score = window.document.getElementById('score');
-  app.Score.innerHTML = app.player.score;
-  window.document.getElementById('playername').innerHTML = window.app.player.name;
+  app.Score.innerHTML = player.get('score');
+  window.document.getElementById('playername').innerHTML = player.get('name');
   window.app.Level = window.document.getElementById('level');
   app.Level.innerHTML = window.level + 1;
 }
 
 function updateScoreBoard(){
-  app.Score.innerHTML = app.player.score;
-  app.Shots.innerHTML = app.player.shotsLeft;
+  app.Score.innerHTML = player.get('score');
+  app.Shots.innerHTML = player.get('bullets');
   app.Level.innerHTML = window.level + 1;
 }
 
@@ -269,7 +264,7 @@ function generateDuckCounter(){
   var dcounter = document.getElementsByClassName('duckcounter')[0];
   dcounter.innerHTML = '';
   for(var i = 0; i < duckIndex; i++){
-    dcounter.innerHTML += "<img src= 'images/duck.jpg' class='duckIMG' />"
+    dcounter.innerHTML += "<img src= 'images/gduck.jpg' class='duckIMG' />"
   }
 }
 
@@ -298,19 +293,28 @@ function onMouseMove(e){
 
 function onMouseDown(e){
   e.preventDefault();
-  if(app.player.shotsLeft == 0)
+  var audio;
+  if(player.get('bulletes') == 0){
+    audio = document.getElementById('empty');
+    audio.load();
+    audio.play();
     return
+  }
+  audio = document.getElementById('fired');
+  audio.load();
+  audio.play();
   document.body.style.cursor = 'crosshair';
   flash();
-  app.player.shotsLeft--;
-  if(app.player.shotsLeft == 0){
-    setTimeout(function(){app.player.reload()}, 2500);
+  player.shoot();
+  console.log(player.clipEmpty())
+  if(player.clipEmpty()){
+    setTimeout(function(){player.reload()}, 2500);
   }
   if ( intersects.length > 0 ) {
     levelCounter++;
-    grayDuck(duckIndex);
     duckIndex--;
-    app.player.score++;
+    grayDuck(duckIndex);
+    player.incrementScoreBy(1);
     scene.remove(intersects[0].object);
     setTimeout(function(){generateBird()},500);
   }
@@ -339,7 +343,7 @@ function animate() {
 
 function flyBird(){
   bird.lookAt( new THREE.Vector3( target[index][0], target[index][1], target[index][2]) );
-  if((bird.position.y > (idealHeight / 10)) || bird.position.y < 20 || bird.position.x > (idealwidth / 10 || bird.position.x < (idealwidth/10))) {
+  if((bird.position.y > (idealHeight / 10)) || bird.position.x > (idealwidth / 10 || bird.position.x < (idealwidth/10))) {
     outOfView(bird);
   }
   else {
@@ -406,7 +410,7 @@ function findMissedBird(){
   var ducks = document.getElementsByTagName('img');
   for(var i = 0 ; i >= levelstats[level][4] - 1; i++){
     var b = ducks[i].src;
-    if( !(b.indexOf('gduck.jpg') > -1) ){
+    if( (b.indexOf('gduck.jpg') > -1) ){
       duckIndex = i;
     }
   }
@@ -414,8 +418,8 @@ function findMissedBird(){
 
 function grayDuck(ind){
   var ducks = document.getElementsByTagName('img');
-  var deadduck = ducks[ind - 1]
-  deadduck.src = 'images/gduck.jpg';
+  var deadduck = ducks[ind]
+  deadduck.src = 'images/duck.jpg';
 }
 
 function render() {
@@ -428,7 +432,9 @@ function render() {
   newgun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
   newgun.rotateY(0);
   updateScoreBoard();
-
+  skyPlane.position.x += 0.5
+  if(skyPlane.position.x > 600)
+    skyPlane.position.x = 0;
   checkIndex();
   updateLevel();
   flyBird();
