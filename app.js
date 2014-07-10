@@ -20,7 +20,6 @@ var camera, scene, renderer, mesh, levels = [];
 var moph, morphs = [];
 var clock = new THREE.Clock();
 window.app.player.reload = function(){
-
   app.player.shotsLeft = 6;
 };
 
