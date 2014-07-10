@@ -44,9 +44,14 @@ function init() {
   generateDuckCounter();
   generateGun();
   generateBird();
-  renderer = new THREE.WebGLRenderer();
+  CreateBirdModel();
+  renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.sortObjects = false;
   renderer.setClearColor( 0x7ec0ee );
+  renderer.gammaInput = true;
+  renderer.gammaOutput = true;
+  renderer.shadowMapEnabled = true;
+  renderer.shadowMapCullFace = THREE.CullFaceBack;
   renderer.setSize( window.innerWidth, window.innerHeight );
   document.body.appendChild( renderer.domElement );
   //
@@ -56,50 +61,49 @@ function init() {
   window.document.addEventListener("mouseup", onMouseUp);
 
 
+  // MODEL
+
+  function CreateBirdModel(){
+    var loader = new THREE.JSONLoader();
+    loader.load( "models/stork.js", function( geometry ) {
+
+      morphColorsToFaceColors( geometry );
+      geometry.computeMorphNormals();
+
+      var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+      var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+
+      meshAnim.duration = 1000;
+
+      var s = 0.35;
+      meshAnim.scale.set( s, s, s );
+      meshAnim.position.y = 15;
+      meshAnim.rotation.y = -1;
+
+      meshAnim.castShadow = true;
+      meshAnim.receiveShadow = true;
+
+      scene.add( meshAnim );
+      morphs.push( meshAnim );
+
+    } );
+  }
+  
+  // EFFECTS
+
   // composer = new THREE.EffectComposer( renderer );
   // composer.addPass( new THREE.RenderPass( scene, camera ) );
-
-
-
   // var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
   // effect.uniforms[ 'amount' ].value = 0.002;
   // effect.renderToScreen = true;
   // composer.addPass( effect );
 
-  // Here is the effect for the Oculus Rift
+  // Oculus Rift Effects!!
+
   // worldScale 100 means that 100 Units == 1m
   effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} );
   effect.setSize( window.innerWidth, window.innerHeight );
 }
-
-function addModelToScene( geometry, materials ){
-  var material = new THREE.MeshFaceMaterial( materials );
-  window.bird = new THREE.Mesh( geometry, material );
-  bird.scale.set(.3,.3,.3);
-  bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
-  bird.velocity = {
-    x: levelstats[level][0],
-    y: levelstats[level][1],
-    z: levelstats[level][2]
-  }
-  // morphColorsToFaceColors( geometry );
-  // addMorph( geometry, 250, 500, bird.position.x -500, 500, 700 ); 
-  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, -200 );
-  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 200 );
-  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 1000 );
-  scene.add( bird );
-}
-
-// function morphColorsToFaceColors( geometry ) {
-
-//   if ( geometry.morphColors && geometry.morphColors.length ) {
-//     var colorMap = geometry.morphColors[ 0 ];
-//     for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-//       geometry.faces[ i ].color = colorMap.colors[ i ];
-//     }
-//   }
-// }
-
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -177,47 +181,26 @@ function generateDuckCounter(){
   for(var i = 0; i < duckIndex; i++){
     dcounter.innerHTML += "<img src= 'images/duck.jpg' class='duckIMG' />"
   }
-  // dcounter.innerHTML = 'Replaced';
 }
 
 function generateBird(){
-  var jsonLoader = new THREE.JSONLoader();  
-  jsonLoader.load( "parrot.js", addModelToScene );
-
-  // bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
-  // bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
-  // bird.velocity = {
-  //   x: levelstats[level][0],
-  //   y: levelstats[level][1],
-  //   z: levelstats[level][2]
-  // }
-  // scene.add(bird);
+  bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
+  bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
+  bird.velocity = {
+    x: levelstats[level][0],
+    y: levelstats[level][1],
+    z: levelstats[level][2]
+  }
+  scene.add(bird);
   index = 0;
   generatePath();
 }
 
 function generateGun(){
-  var jsonLoader = new THREE.JSONLoader();  
-  jsonLoader.load( "weapon-light.js", addGunToScene );
-
-  // var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
-  // gun.position.set(0,40,190);
-  // window.Gun = gun;
-  // scene.add(gun);
-}
-
-function addGunToScene( geometry, materials ){
-  var material = new THREE.MeshFaceMaterial( materials );
-  window.Gun = new THREE.Mesh( geometry, material );
-  Gun.scale.set(3,3,3);
-  Gun.position.set(0,-10,110);
-  Gun.rotateY(-50);
-  // morphColorsToFaceColors( geometry );
-  // addMorph( geometry, 250, 500, bird.position.x -500, 500, 700 ); 
-  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, -200 );
-  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 200 );
-  // addMorph( geometry, 250, 500, bird.position.x - Math.random() * 500, 500, 1000 );
-  scene.add( Gun );
+  var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
+  gun.position.set(0,40,190);
+  window.Gun = gun;
+  scene.add(gun);
 }
 
 function onMouseMove(e){
@@ -273,30 +256,6 @@ function animate() {
   requestAnimationFrame( animate );
   render();
 }
-
-// function addMorph( geometry, speed, duration, x, y, z ) {
-
-//   var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
-
-//   var meshAnim = new THREE.MorphAnimMesh( geometry, material );
-
-//   meshAnim.speed = speed;
-//   meshAnim.duration = duration;
-//   meshAnim.time = 600 * Math.random();
-
-//   meshAnim.position.set( x, y, z );
-//   meshAnim.rotation.y = Math.PI/2;
-
-//   meshAnim.castShadow = true;
-//   meshAnim.receiveShadow = false;
-
-//   scene.add( meshAnim );
-
-//   morphs.push( meshAnim );
-
-//   renderer.initWebGLObjects( scene );
-
-// }
 
 function flyBird(){
 
@@ -381,16 +340,12 @@ function grayDuck(ind){
 
 function render() {
   var delta = clock.getDelta();
+
   camera.lookAt( scene.position );
   // camera.rotateX((1 - app.vertLook) *Math.PI/2)
   Gun.lookAt( scene.position );
-  // Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
-  // Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
-  // Gun.rotateY(0);
-  Gun.rotateY(((app.horzLook)*-1) * Math.PI/2);
-  Gun.rotateZ((1 - 3*app.vertLook) * (Math.PI - 3)/2 );
-
-  // Gun.rotateZ()
+  Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
+  Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
   Gun.rotateY(0);
   updateScoreBoard();
 
@@ -399,21 +354,30 @@ function render() {
   flyBird();
   if( isNearTarget() )
     index++;
-  // for ( var i = 0; i < morphs.length; i ++ ) {
 
-  //   morph = morphs[ i ];
+  for ( var i = 0; i < morphs.length; i ++ ) {
+    morph = morphs[ i ];
+    morph.updateAnimation( 1000 * delta );
+  }
 
-  //   morph.updateAnimation( 1000 * delta );
-
-  //   morph.position.x += morph.speed * delta;
-
-  //   if ( morph.position.x  > 2000 )  {
-
-  //     morph.position.x = -1500 - Math.random() * 500;
-
-  //   }
-  // }
   renderer.render( scene, camera );
   // effect.render(scene, camera);
 
 }
+
+function morphColorsToFaceColors( geometry ) {
+
+  if ( geometry.morphColors && geometry.morphColors.length ) {
+
+    var colorMap = geometry.morphColors[ 0 ];
+
+    for ( var i = 0; i < colorMap.colors.length; i ++ ) {
+
+      geometry.faces[ i ].color = colorMap.colors[ i ];
+
+    }
+
+  }
+
+}
+
