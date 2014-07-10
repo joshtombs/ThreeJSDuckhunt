@@ -35,6 +35,89 @@ window.bird.velocity = {x:0,y:0,z:0}
 init();
 animate();
 
+
+  // MODEL
+
+function CreateBirdModel(){
+  var loader = new THREE.JSONLoader();
+  loader.load( "models/stork.js", function( geometry ) {
+
+    morphColorsToFaceColors( geometry );
+    geometry.computeMorphNormals();
+
+    var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+    window.bird = new THREE.MorphAnimMesh( geometry, material );
+
+    bird.duration = 1000;
+
+    var s = 0.15;
+    bird.scale.set( s, s, s );
+    bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
+
+    bird.rotation.y = -1;
+
+    bird.castShadow = true;
+    bird.receiveShadow = true;
+
+    bird.velocity = {
+      x: levelstats[level][0],
+      y: levelstats[level][1],
+      z: levelstats[level][2]
+    }
+
+    scene.add( bird );
+    morphs.push( bird );
+
+  } );
+}
+
+function CreateGunModel(){
+  var loader = new THREE.JSONLoader();
+  loader.load( "models/hyperblaster.js", function( geometry ) {
+
+    morphColorsToFaceColors( geometry );
+    geometry.computeMorphNormals();
+
+    var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+    window.newgun = new THREE.MorphAnimMesh( geometry, material );
+
+    newgun.duration = 1000;
+
+    var s = 0.75;
+    newgun.scale.set( s, s, s );
+    newgun.position.set(11,30,200);
+
+    newgun.rotation.y = -5;
+    newgun.rotation.x = 6;
+    newgun.rotation.z = 5;
+
+    newgun.castShadow = true;
+    newgun.receiveShadow = true;
+
+    scene.add( newgun );
+    // morphs.push( newgun );
+
+  } );
+}
+
+function CreateTreeModel(){
+  var loader = new THREE.JSONLoader();
+  loader.load( "models/tree.js", function( geometry ) {
+    var materialScene = new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading } );
+    treeMesh = new THREE.Mesh( geometry, materialScene );
+    treeMesh.position.set(randomNum(-100,100),10,randomNum(0,80));
+
+    var sc = 50;
+    treeMesh.scale.set( sc, sc, sc );
+
+    treeMesh.matrixAutoUpdate = false;
+    treeMesh.updateMatrix();
+
+    scene.add( treeMesh );
+
+  } );
+}
+
 function init() {
   document.body.style.cursor = 'crosshair';
   camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -44,7 +127,7 @@ function init() {
   generateDuckCounter();
   generateGun();
   generateBird();
-  CreateBirdModel();
+  CreateTreeModel();
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.sortObjects = false;
   renderer.setClearColor( 0x7ec0ee );
@@ -60,35 +143,6 @@ function init() {
   window.document.addEventListener("mousedown", onMouseDown);
   window.document.addEventListener("mouseup", onMouseUp);
 
-
-  // MODEL
-
-  function CreateBirdModel(){
-    var loader = new THREE.JSONLoader();
-    loader.load( "models/stork.js", function( geometry ) {
-
-      morphColorsToFaceColors( geometry );
-      geometry.computeMorphNormals();
-
-      var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-      var meshAnim = new THREE.MorphAnimMesh( geometry, material );
-
-      meshAnim.duration = 1000;
-
-      var s = 0.35;
-      meshAnim.scale.set( s, s, s );
-      meshAnim.position.y = 15;
-      meshAnim.rotation.y = -1;
-
-      meshAnim.castShadow = true;
-      meshAnim.receiveShadow = true;
-
-      scene.add( meshAnim );
-      morphs.push( meshAnim );
-
-    } );
-  }
-  
   // EFFECTS
 
   // composer = new THREE.EffectComposer( renderer );
@@ -133,7 +187,29 @@ function DrawGrass(){
 }
 
 function DrawSun(){
-  scene.add(new THREE.HemisphereLight(app.skyColor, 0x00FF00, 5))
+  // scene.add(new THREE.HemisphereLight(app.skyColor, 0x00FF00, 5))
+  var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+  dirLight.color.setHSL( 0.1, 1, 0.95 );
+  dirLight.position.set( -1, 1.75, 1 );
+  dirLight.position.multiplyScalar( 50 );
+
+  dirLight.castShadow = true;
+  dirLight.shadowMapWidth = 2048;
+  dirLight.shadowMapHeight = 2048;
+  
+  var d = 50;
+
+  dirLight.shadowCameraLeft = -d;
+  dirLight.shadowCameraRight = d;
+  dirLight.shadowCameraTop = d;
+  dirLight.shadowCameraBottom = -d;
+
+  dirLight.shadowCameraFar = 3500;
+  dirLight.shadowBias = -0.0001;
+  dirLight.shadowDarkness = 0.35;
+
+  scene.add( dirLight );
+
   var sunsphere = new THREE.Mesh( new THREE.SphereGeometry(100,100,100), new THREE.MeshLambertMaterial({color: 'yellow'}));
   sunsphere.position.z=-200;
   scene.add(sunsphere);
@@ -142,19 +218,20 @@ function DrawSun(){
 function DrawBushes(){
   var bush;
   for(var i = 0; i < 20; i++){
-    bush = new THREE.Mesh(new THREE.BoxGeometry(20,8,10), new THREE.MeshLambertMaterial({color:0x002000}));
+    bush = new THREE.Mesh(new THREE.BoxGeometry(20,8,10), new THREE.MeshLambertMaterial({color:0x006000}));
     bush.position.set((20*i -200),30,140);
     scene.add(bush);
   }
 }
 
 function DrawTrees(){
-  var tree;
+  // var tree;
   var numTrees = randomNum(2,4);
   for(var i = 1; i < numTrees; i++){
-    tree = new THREE.Mesh(new THREE.BoxGeometry(10,randomNum(30,90),10), new THREE.MeshLambertMaterial({color:0x0987143}));
-    tree.position.set(randomNum(-100,100),30,randomNum(0,80));
-    scene.add(tree);
+    CreateTreeModel();
+    // tree = new THREE.Mesh(new THREE.BoxGeometry(10,randomNum(30,90),10), new THREE.MeshLambertMaterial({color:0x0987143}));
+    // tree.position.set(randomNum(-100,100),30,randomNum(0,80));
+    // scene.add(tree);
   }
  }
 
@@ -184,23 +261,25 @@ function generateDuckCounter(){
 }
 
 function generateBird(){
-  bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
-  bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
-  bird.velocity = {
-    x: levelstats[level][0],
-    y: levelstats[level][1],
-    z: levelstats[level][2]
-  }
-  scene.add(bird);
+  // bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
+  CreateBirdModel();
+  // bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
+  // bird.velocity = {
+  //   x: levelstats[level][0],
+  //   y: levelstats[level][1],
+  //   z: levelstats[level][2]
+  // }
+  // scene.add(bird);
   index = 0;
   generatePath();
 }
 
 function generateGun(){
-  var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
-  gun.position.set(0,40,190);
-  window.Gun = gun;
-  scene.add(gun);
+  CreateGunModel();
+  // var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
+  // gun.position.set(0,40,190);
+  // window.Gun = gun;
+  // scene.add(gun);
 }
 
 function onMouseMove(e){
@@ -258,7 +337,7 @@ function animate() {
 }
 
 function flyBird(){
-
+  bird.lookAt( new THREE.Vector3( target[index][0], target[index][1], target[index][2]) );
   if((bird.position.y > (window.innerHeight / 10)) || bird.position.x > (window.innerWidth / 10 || bird.position.x < (window.innerWidth/10))) {
     outOfView(bird);
   }
@@ -343,10 +422,10 @@ function render() {
 
   camera.lookAt( scene.position );
   // camera.rotateX((1 - app.vertLook) *Math.PI/2)
-  Gun.lookAt( scene.position );
-  Gun.rotateY((((app.horzLook)*-2))* Math.PI/2);
-  Gun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
-  Gun.rotateY(0);
+  newgun.lookAt( scene.position );
+  newgun.rotateY((((app.horzLook)*-2))* Math.PI/2);
+  newgun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
+  newgun.rotateY(0);
   updateScoreBoard();
 
   checkIndex();
