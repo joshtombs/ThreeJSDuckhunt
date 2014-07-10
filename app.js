@@ -1,4 +1,6 @@
 window.app = {};
+window.idealwidth = window.innerWidth;
+window.idealHeight = idealwidth * (3/7);
 window.app.player = {};
 window.app.vertLook = 0.5;
 window.app.horzLook = 0.5;
@@ -7,6 +9,9 @@ window.app.player.score = 0;
 window.app.player.name = 'Player Name';
 window.app.player.shotsLeft = 6;
 window.bird = {};
+window.bird.position = {};
+window.bird.position = {x:0,y:0,z:0};
+window.bird.velocity = {x:0,y:0,z:0};
 window.Gun = {};
 window.target = [];
 window.index = 0;
@@ -24,11 +29,6 @@ window.app.player.reload = function(){
 };
 
 
-
-window.bird.position = {};
-window.bird.position = {x:0,y:0,z:0}
-window.bird.velocity = {x:0,y:0,z:0}
-
 // if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 init();
@@ -44,14 +44,14 @@ function CreateBirdModel(){
     morphColorsToFaceColors( geometry );
     geometry.computeMorphNormals();
 
-    var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+    var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xC0C0C0, shininess: 5, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
     window.bird = new THREE.MorphAnimMesh( geometry, material );
 
     bird.duration = 1000;
 
     var s = 0.15;
     bird.scale.set( s, s, s );
-    bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
+    bird.position.set(randomNum((-idealwidth/20),(idealwidth/20)), 25, randomNum(50,110));
 
     bird.rotation.y = -1;
 
@@ -77,7 +77,7 @@ function CreateGunModel(){
     morphColorsToFaceColors( geometry );
     geometry.computeMorphNormals();
 
-    var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+    var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
     window.newgun = new THREE.MorphAnimMesh( geometry, material );
 
     newgun.duration = 1000;
@@ -119,7 +119,7 @@ function CreateTreeModel(){
 
 function init() {
   document.body.style.cursor = 'crosshair';
-  camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+  camera = new THREE.PerspectiveCamera( 60, idealwidth / idealHeight, 1, 1000 );
   camera.position.set( 0, 50, 205 );
   createScenery();
   generateScoreBoard();
@@ -134,7 +134,7 @@ function init() {
   renderer.gammaOutput = true;
   renderer.shadowMapEnabled = true;
   renderer.shadowMapCullFace = THREE.CullFaceBack;
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize( idealwidth, idealHeight );
   document.body.appendChild( renderer.domElement );
   //
   window.addEventListener( 'resize', onWindowResize, false );
@@ -155,21 +155,25 @@ function init() {
 
   // worldScale 100 means that 100 Units == 1m
   effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} );
-  effect.setSize( window.innerWidth, window.innerHeight );
+  effect.setSize( idealwidth, idealHeight );
 }
 
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = idealwidth / idealHeight;
   camera.updateProjectionMatrix();
 
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  // effect.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize( idealwidth, idealHeight );
+  // effect.setSize( idealwidth, idealHeight );
 }
 
 function createScenery(){
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog( 0xEBEBEB, 0, 500);
-  skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(window.innerWidth, window.innerHeight), new THREE.MeshBasicMaterial({color: app.skyColor}));
+  scene.fog = new THREE.Fog( 0xEBEBEB, 0, 900);
+  skytexture = THREE.ImageUtils.loadTexture("images/cloud.jpg");
+  skytexture.wrapS = THREE.RepeatWrapping;
+  skytexture.wrapT = THREE.RepeatWrapping;
+  skytexture.repeat.set(0.7,0.3);
+  skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(idealwidth, idealHeight), new THREE.MeshBasicMaterial({color: app.skyColor, map: skytexture}));
   skyPlane.position.z -= 150;
   scene.add(skyPlane);
   DrawGrass();
@@ -179,7 +183,12 @@ function createScenery(){
 }
 
 function DrawGrass(){
-    var newplane = new THREE.Mesh( new THREE.PlaneGeometry(window.innerWidth,255), new THREE.MeshLambertMaterial({color: 0x003300}));
+    var grasstexture = THREE.ImageUtils.loadTexture("images/grass.jpg");
+    grasstexture.wrapS = THREE.RepeatWrapping;
+    grasstexture.wrapT = THREE.RepeatWrapping;
+    grasstexture.repeat.set(4,4);
+    var newplane = new THREE.Mesh( new THREE.PlaneGeometry(idealwidth,255), new THREE.MeshLambertMaterial({color: 0x003300, map:grasstexture}));
+    
     newplane.position.z +=30;
     newplane.rotation.x = - Math.PI / 2;
     scene.add(newplane);
@@ -187,9 +196,9 @@ function DrawGrass(){
 
 function DrawSun(){
   // scene.add(new THREE.HemisphereLight(app.skyColor, 0x00FF00, 5))
-  var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+  var dirLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
   dirLight.color.setHSL( 0.1, 1, 0.95 );
-  dirLight.position.set( -1, 1.75, 1 );
+  dirLight.position.set( 0, 1.75, 1 );
   dirLight.position.multiplyScalar( 50 );
 
   dirLight.castShadow = true;
@@ -209,28 +218,33 @@ function DrawSun(){
 
   scene.add( dirLight );
 
-  var sunsphere = new THREE.Mesh( new THREE.SphereGeometry(100,100,100), new THREE.MeshLambertMaterial({color: 'yellow'}));
+  suntexture = THREE.ImageUtils.loadTexture("images/sun.jpg");
+  suntexture.wrapS = THREE.RepeatWrapping;
+  suntexture.wrapT = THREE.RepeatWrapping;
+  suntexture.repeat.set(3,3);
+
+  var sunsphere = new THREE.Mesh( new THREE.SphereGeometry(100,100,100), new THREE.MeshLambertMaterial({color: 'yellow', map: suntexture}));
   sunsphere.position.z=-200;
   scene.add(sunsphere);
 }
 
 function DrawBushes(){
   var bush;
+  bushtexture = THREE.ImageUtils.loadTexture("images/bush.png");
+  bushtexture.wrapS = THREE.RepeatWrapping;
+  bushtexture.wrapT = THREE.RepeatWrapping;
+  bushtexture.repeat.set(8,8);
   for(var i = 0; i < 20; i++){
-    bush = new THREE.Mesh(new THREE.BoxGeometry(20,8,10), new THREE.MeshLambertMaterial({color:0x006000}));
+    bush = new THREE.Mesh(new THREE.BoxGeometry(20,8,10), new THREE.MeshLambertMaterial({color:0x004000, map:bushtexture}));
     bush.position.set((20*i -200),30,140);
     scene.add(bush);
   }
 }
 
 function DrawTrees(){
-  // var tree;
   var numTrees = randomNum(2,4);
   for(var i = 1; i < numTrees; i++){
     CreateTreeModel();
-    // tree = new THREE.Mesh(new THREE.BoxGeometry(10,randomNum(30,90),10), new THREE.MeshLambertMaterial({color:0x0987143}));
-    // tree.position.set(randomNum(-100,100),30,randomNum(0,80));
-    // scene.add(tree);
   }
  }
 
@@ -260,33 +274,21 @@ function generateDuckCounter(){
 }
 
 function generateBird(){
-  // bird = new THREE.Mesh( new THREE.SphereGeometry(3,10,10), new THREE.MeshLambertMaterial({color:'red'}));
   CreateBirdModel();
-  // bird.position.set(randomNum((-window.innerWidth/20),(window.innerWidth/20)), 25, randomNum(50,110));
-  // bird.velocity = {
-  //   x: levelstats[level][0],
-  //   y: levelstats[level][1],
-  //   z: levelstats[level][2]
-  // }
-  // scene.add(bird);
   index = 0;
   generatePath();
 }
 
 function generateGun(){
   CreateGunModel();
-  // var gun = new THREE.Mesh( new THREE.BoxGeometry(20,5,5), new THREE.MeshLambertMaterial({color:0xAC7728}));
-  // gun.position.set(0,40,190);
-  // window.Gun = gun;
-  // scene.add(gun);
 }
 
 function onMouseMove(e){
-  app.vertLook = e.y/window.innerHeight;
-  app.horzLook = e.x/window.innerWidth;
+  app.vertLook = e.y/idealHeight;
+  app.horzLook = e.x/idealwidth;
 
-  mouse.x = 2 * (e.clientX / window.innerWidth) -1;
-  mouse.y = 1 - 2 * (e.clientY / window.innerHeight);
+  mouse.x = 2 * (e.clientX / idealwidth) -1;
+  mouse.y = 1 - 2 * (e.clientY / idealHeight);
 
   var raycaster = projector.pickingRay( mouse.clone(), camera );
   window.intersects = raycaster.intersectObject( bird );
@@ -337,7 +339,7 @@ function animate() {
 
 function flyBird(){
   bird.lookAt( new THREE.Vector3( target[index][0], target[index][1], target[index][2]) );
-  if((bird.position.y > (window.innerHeight / 10)) || bird.position.x > (window.innerWidth / 10 || bird.position.x < (window.innerWidth/10))) {
+  if((bird.position.y > (idealHeight / 10)) || bird.position.y < 20 || bird.position.x > (idealwidth / 10 || bird.position.x < (idealwidth/10))) {
     outOfView(bird);
   }
   else {
@@ -367,7 +369,7 @@ function isNearTarget(){
 function generatePath(){
   b = 25;
   var i = 0;
-  while(b < (window.innerHeight/10 + 20 )){
+  while(b < (idealHeight/10 + 20 )){
     b += 5;
     target[i] = [];
     target[i][0] = randomNum(bird.position.x - levelstats[level][3], bird.position.x + levelstats[level][3]);
