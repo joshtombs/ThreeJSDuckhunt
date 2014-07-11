@@ -1,14 +1,15 @@
 window.app = window.app || {};
+app.randomNum = function(min, max){
+  var num = Math.random()*(max-min+1) + min;
+  return num;
+};
 window.idealwidth = window.innerWidth;
 window.idealHeight = idealwidth * (3/7);
 window.app.vertLook = 0.5;
 window.app.horzLook = 0.5;
 window.app.skyColor = 0x6E91FF;
-window.bird = {};
-window.bird.position = {};
-window.bird.position = {x:0,y:0,z:0};
-window.bird.velocity = {x:0,y:0,z:0};
 window.Gun = {};
+window.newgun= null;
 window.target = [];
 window.index = 0;
 window.levelstats = [[0.1,0.1,0,30,3],[0.1,0.1,0,50,4],[0.2,0.2,0.2,40,5],[0.3,0.3,0.2,50,6],[0.3,0.3,0.3,60,6],[0.4,0.4,0.3,60,6]];
@@ -18,50 +19,26 @@ window.duckIndex = 0;
 var mouse = new THREE.Vector3();
 var projector = new THREE.Projector();
 var camera, scene, renderer, mesh, levels = [];
-var moph, morphs = [];
+var morph, morphs = [];
 var clock = new THREE.Clock();
 var player = new app.Models.Player();
-console.log(player);
-
-// if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 init();
-animate();
-
-
-  // MODEL
+render();
 
 function CreateBirdModel(){
-  var loader = new THREE.JSONLoader();
-  loader.load( "models/stork.js", function( geometry ) {
-
-    morphColorsToFaceColors( geometry );
-    geometry.computeMorphNormals();
-
-    var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xC0C0C0, shininess: 5, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-    window.bird = new THREE.MorphAnimMesh( geometry, material );
-
-    bird.duration = 1000;
-
-    var s = 0.15;
-    bird.scale.set( s, s, s );
-    bird.position.set(randomNum((-idealwidth/20),(idealwidth/20)), 25, randomNum(50,110));
-
-    bird.rotation.y = -1;
-
-    bird.castShadow = true;
-    bird.receiveShadow = true;
-
-    bird.velocity = {
-      x: levelstats[level][0],
-      y: levelstats[level][1],
-      z: levelstats[level][2]
+  window.bird = new app.Models.Bird({
+    position: {
+      x: app.randomNum((-idealwidth/20),(idealwidth/20)),
+      y: 25,
+      z: app.randomNum(50,110)
     }
-
-    scene.add( bird );
-    morphs.push( bird );
-
-  } );
+  });
+  bird.generateBird(function(bird){
+    scene.add(bird);
+    morphs.push(bird);
+  });
+  index = 0;
 }
 
 function CreateGunModel(){
@@ -98,9 +75,9 @@ function CreateTreeModel(){
   loader.load( "models/tree.js", function( geometry ) {
     var materialScene = new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading } );
     treeMesh = new THREE.Mesh( geometry, materialScene );
-    treeMesh.position.set(randomNum(-100,100),10,randomNum(0,80));
+    treeMesh.position.set(app.randomNum(-100,100),10,app.randomNum(0,80));
 
-    var sc = randomNum(40,80);
+    var sc = app.randomNum(40,80);
     treeMesh.scale.set( sc, sc, sc );
 
     treeMesh.matrixAutoUpdate = false;
@@ -119,7 +96,7 @@ function init() {
   generateScoreBoard();
   generateDuckCounter();
   generateGun();
-  generateBird();
+  CreateBirdModel();
   CreateTreeModel();
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.sortObjects = false;
@@ -237,7 +214,7 @@ function DrawBushes(){
 }
 
 function DrawTrees(){
-  var numTrees = randomNum(2,4);
+  var numTrees = app.randomNum(2,4);
   for(var i = 1; i < numTrees; i++){
     CreateTreeModel();
   }
@@ -268,12 +245,6 @@ function generateDuckCounter(){
   }
 }
 
-function generateBird(){
-  CreateBirdModel();
-  index = 0;
-  generatePath();
-}
-
 function generateGun(){
   CreateGunModel();
 }
@@ -286,7 +257,7 @@ function onMouseMove(e){
   mouse.y = 1 - 2 * (e.clientY / idealHeight);
 
   var raycaster = projector.pickingRay( mouse.clone(), camera );
-  window.intersects = raycaster.intersectObject( bird );
+  window.intersects = raycaster.intersectObject(bird.get('threeBird'));
 
   document.body.style.cursor = 'crosshair';
 }
@@ -294,19 +265,15 @@ function onMouseMove(e){
 function onMouseDown(e){
   e.preventDefault();
   var audio;
-  if(player.get('bulletes') == 0){
+  if(player.clipEmpty()){
     audio = document.getElementById('empty');
     audio.load();
     audio.play();
     return
   }
-  audio = document.getElementById('fired');
-  audio.load();
-  audio.play();
   document.body.style.cursor = 'crosshair';
   flash();
   player.shoot();
-  console.log(player.clipEmpty())
   if(player.clipEmpty()){
     setTimeout(function(){player.reload()}, 2500);
   }
@@ -316,7 +283,8 @@ function onMouseDown(e){
     grayDuck(duckIndex);
     player.incrementScoreBy(1);
     scene.remove(intersects[0].object);
-    setTimeout(function(){generateBird()},500);
+    morphs.pop();
+    setTimeout(function(){CreateBirdModel()},500);
   }
 }
 
@@ -325,67 +293,27 @@ function onMouseUp(e){
   document.body.style.cursor = 'crosshair';
 }
 
-function randomNum(min, max){
-  var num = Math.random()*(max-min+1) + min;
-  return num;
-}
-
 function flash(){
   var flash = new THREE.AmbientLight(0xFFFFFF,10);
   scene.add(flash);
   setTimeout(function(){scene.remove(flash)},70);
 }
 
-function animate() {
-  requestAnimationFrame( animate );
-  render();
-}
+// function isNearTarget() {
+//   if (bird.get('threeBird') == void 0) {
+//     return 
+//   }
 
-function flyBird(){
-  bird.lookAt( new THREE.Vector3( target[index][0], target[index][1], target[index][2]) );
-  if((bird.position.y > (idealHeight / 10)) || bird.position.x > (idealwidth / 10 || bird.position.x < (idealwidth/10))) {
-    outOfView(bird);
-  }
-  else {
-    if((bird.position.x < target[index][0] ) && (Math.abs(bird.position.x - target[index][0]) > 1))
-      bird.position.x += bird.velocity.x;
-    else if((bird.position.x > target[index][0])  && (Math.abs(bird.position.x - target[index][0]) > 1))
-      bird.position.x -= bird.velocity.x;
-    if((bird.position.y < target[index][1]) && (Math.abs(bird.position.x - target[index][1]) > .8))
-      bird.position.y += bird.velocity.y;
-    else if((bird.position.y > target[index][1]) && (Math.abs(bird.position.y - target[index][1]) > .8))
-      bird.position.y -= bird.velocity.y;
-    if((bird.position.z < target[index][3]) && (Math.abs(bird.position.z - target[index][3]) > 1))
-      bird.position.z += bird.velocity.z;
-    else if((bird.position.z > target[index][3])  && (Math.abs(bird.position.z - target[index][3]) > 1))
-      bird.position.z -= bird.velocity.z;
-  }
-}
+//   var p       = bird.get("path")[index];
+//   var birdPos = bird.get('threeBird').position;
 
-function isNearTarget(){
-  if(((target[index][0] - bird.position.x) < 4)&&((target[index][1] - bird.position.y) < 1)){
-    return true
-  } 
-  else 
-    return false
-}
+//   return (Math.abs(p.x - birdPos.x) < 4) && (Math.abs(p.y - birdPos.y)) < 1
+// }
 
-function generatePath(){
-  b = 25;
-  var i = 0;
-  while(b < (idealHeight/10 + 20 )){
-    b += 5;
-    target[i] = [];
-    target[i][0] = randomNum(bird.position.x - levelstats[level][3], bird.position.x + levelstats[level][3]);
-    target[i][1] = randomNum(b - 10, b + 10);
-    target[i][2] = randomNum(60,120);
-    i++;
-  }
-}
-
-function outOfView(bird){
-  scene.remove(bird);
-  generateBird();
+function outOfView(){
+  scene.remove(bird.get('threeBird'));
+  morphs.pop();
+  CreateBirdModel();
   duckIndex--;
 }
 
@@ -423,23 +351,28 @@ function grayDuck(ind){
 }
 
 function render() {
+  requestAnimationFrame(render);
+
   var delta = clock.getDelta();
 
   camera.lookAt( scene.position );
   // camera.rotateX((1 - app.vertLook) *Math.PI/2)
-  newgun.lookAt( scene.position );
-  newgun.rotateY((((app.horzLook)*-2))* Math.PI/2);
-  newgun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
-  newgun.rotateY(0);
+  if(newgun != undefined){
+    newgun.lookAt( scene.position );
+    newgun.rotateY((((app.horzLook)*-2))* Math.PI/2);
+    newgun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
+    newgun.rotateY(0);
+  }
   updateScoreBoard();
   skyPlane.position.x += 0.5
   if(skyPlane.position.x > 600)
     skyPlane.position.x = 0;
   checkIndex();
   updateLevel();
-  flyBird();
-  if( isNearTarget() )
-    index++;
+  if(bird.get('threeBird') != undefined){
+    bird.fly();
+    bird.updateTarget();
+  }
 
   for ( var i = 0; i < morphs.length; i ++ ) {
     morph = morphs[ i ];

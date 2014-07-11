@@ -11,10 +11,14 @@ window.app = window.app || {}
       var audio;
       audio = document.getElementById('reload');
       audio.load();
-      audio.play();
+      // audio.play();
       this.set('bullets', 6); 
     },
     shoot: function(){
+      var audio;
+      audio = document.getElementById('fired');
+      audio.load();
+      // audio.play();
       this.set('bullets', Math.max((this.get('bullets')-1), 0));
     },
     clipEmpty: function(){ 
