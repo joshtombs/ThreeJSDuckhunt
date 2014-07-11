@@ -16,7 +16,7 @@ window.app = window.app || {};
         window.level++;
     },
     start: function(){
-      this.scene = new app.Models.Scene();
+      this.scene = new app.Views.Scene();
     }
   })
 })(window.app, Backbone)

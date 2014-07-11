@@ -40,7 +40,7 @@ window.app = window.app || {};
       while(b < (window.idealHeight/10 + 20 )){
         b += 5;
         this.get('path')[i] = {
-          x: app.randomNum(this.get('threeBird').position.x - window.levelstats[window.level][3], this.get('threeBird').position.x + window.levelstats[window.level][3]),
+          x: app.randomNum(this.get('threeBird').position.x - /*levelmax*/, this.get('threeBird').position.x + /*levelmax*/),
           y: app.randomNum(b - 10, b + 10), 
           z: app.randomNum(60, 120)
         };
@@ -52,23 +52,18 @@ window.app = window.app || {};
       var birdPath = this.get('path')[index];
       var velocity = this.get('velocity');
       this.get('threeBird').lookAt( new THREE.Vector3( this.get('path')[index].x, this.get('path')[index].y, this.get('path')[index].z) );
-      if((birdPos.y > (window.idealHeight / 10)) || birdPos.x > (window.idealwidth / 5) || birdPos.x < -(window.idealwidth/5)) {
-        this.get('scene').outOfView(this.get('threeBird'));
-      }
-      else {      
-        if((birdPos.x < birdPath.x ) && (Math.abs(birdPos.x - birdPath.x) > 1))
-          birdPos.x += velocity.x;
-        else if((birdPos.x > birdPath.x)  && (Math.abs(birdPos.x - birdPath.x) > 1))
-          birdPos.x -= velocity.x;
-        if((birdPos.y < birdPath.y) && (Math.abs(birdPos.x - birdPath.y) > .8))
-          birdPos.y += velocity.y;
-        else if((birdPos.y > birdPath.y) && (Math.abs(birdPos.y - birdPath.y) > .8))
-          birdPos.y -= velocity.y;
-        if((birdPos.z < birdPath.z) && (Math.abs(birdPos.z - birdPath.z) > 1))
-          birdPos.z += velocity.z;
-        else if((birdPos.z > birdPath.z)  && (Math.abs(birdPos.z - birdPath.z) > 1))
-          birdPos.z -= velocity.z;
-      }
+      if((birdPos.x < birdPath.x ) && (Math.abs(birdPos.x - birdPath.x) > 1))
+        birdPos.x += velocity.x;
+      else if((birdPos.x > birdPath.x)  && (Math.abs(birdPos.x - birdPath.x) > 1))
+        birdPos.x -= velocity.x;
+      if((birdPos.y < birdPath.y) && (Math.abs(birdPos.x - birdPath.y) > .8))
+        birdPos.y += velocity.y;
+      else if((birdPos.y > birdPath.y) && (Math.abs(birdPos.y - birdPath.y) > .8))
+        birdPos.y -= velocity.y;
+      if((birdPos.z < birdPath.z) && (Math.abs(birdPos.z - birdPath.z) > 1))
+        birdPos.z += velocity.z;
+      else if((birdPos.z > birdPath.z)  && (Math.abs(birdPos.z - birdPath.z) > 1))
+        birdPos.z -= velocity.z;
     },
     updateTarget: function(){
       var p       = bird.get("path")[index];

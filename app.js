@@ -18,68 +18,21 @@ window.levelCounter = 0;
 window.duckIndex = 0;
 var mouse = new THREE.Vector3();
 var projector = new THREE.Projector();
-var camera,renderer, mesh, levels = [];
+var renderer, mesh, levels = [];
 var morph, morphs = [];
 var clock = new THREE.Clock();
 var player = new app.Models.Player();
-var scene = new app.Views.Scene();
+var level = new app.Models.Level();
 
 init();
 render();
 
-function CreateBirdModel(){
-  window.bird = new app.Models.Bird({
-    position: {
-      x: app.randomNum((-idealwidth/20),(idealwidth/20)),
-      y: 25,
-      z: app.randomNum(50,110)
-    }
-  });
-  bird.generateBird(function(bird){
-    scene.add(bird);
-    morphs.push(bird);
-  });
-  index = 0;
-}
-
-function CreateGunModel(){
-  var loader = new THREE.JSONLoader();
-  loader.load( "models/hyperblaster.js", function( geometry ) {
-
-    morphColorsToFaceColors( geometry );
-    geometry.computeMorphNormals();
-
-    var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-    window.newgun = new THREE.MorphAnimMesh( geometry, material );
-
-    newgun.duration = 1000;
-
-    var s = 0.75;
-    newgun.scale.set( s, s, s );
-    newgun.position.set(11,30,200);
-
-    newgun.rotation.y = -5;
-    newgun.rotation.x = 6;
-    newgun.rotation.z = 5;
-
-    newgun.castShadow = true;
-    newgun.receiveShadow = true;
-
-    scene.add( newgun );
-    // morphs.push( newgun );
-
-  } );
-}
-
 function init() {
   document.body.style.cursor = 'crosshair';
-  camera = new THREE.PerspectiveCamera( 60, idealwidth / idealHeight, 1, 1000 );
-  camera.position.set( 0, 50, 205 );
   generateScoreBoard();
   generateDuckCounter();
-  generateGun();
-  CreateBirdModel();
   generateLevels(); 
+  level.start();
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.sortObjects = false;
   renderer.setClearColor( 0x7ec0ee );
@@ -133,40 +86,11 @@ function generateLevels(){
 }
 
 function onWindowResize() {
-  camera.aspect = idealwidth / idealHeight;
-  camera.updateProjectionMatrix();
+  level.get('scene').camera.aspect = idealwidth / idealHeight;
+  level.get('scene').camera.updateProjectionMatrix();
 
   renderer.setSize( idealwidth, idealHeight );
   // effect.setSize( window.innerWidth, window.innerHeight );
-}
-
-function generateScoreBoard(){
-  window.app.Shots = window.document.getElementById('shotsleft');
-  app.Shots.innerHTML = player.get('bullets');
-  window.app.Score = window.document.getElementById('score');
-  app.Score.innerHTML = player.get('score');
-  window.document.getElementById('playername').innerHTML = player.get('name');
-  window.app.Level = window.document.getElementById('level');
-  app.Level.innerHTML = window.level + 1;
-}
-
-function updateScoreBoard(){
-  app.Score.innerHTML = player.get('score');
-  app.Shots.innerHTML = player.get('bullets');
-  app.Level.innerHTML = window.level + 1;
-}
-
-function generateDuckCounter(){
-  duckIndex = levelstats[level][4];
-  var dcounter = document.getElementsByClassName('duckcounter')[0];
-  dcounter.innerHTML = '';
-  for(var i = 0; i < duckIndex; i++){
-    dcounter.innerHTML += "<img src= 'images/gduck.jpg' class='duckIMG' />"
-  }
-}
-
-function generateGun(){
-  CreateGunModel();
 }
 
 function onMouseMove(e){
@@ -176,7 +100,7 @@ function onMouseMove(e){
   mouse.x = 2 * (e.clientX / idealwidth) -1;
   mouse.y = 1 - 2 * (e.clientY / idealHeight);
 
-  var raycaster = projector.pickingRay( mouse.clone(), camera );
+  var raycaster = projector.pickingRay( mouse.clone(), level.get('scene').camera );
   window.intersects = raycaster.intersectObject(bird.get('threeBird'));
 
   document.body.style.cursor = 'crosshair';
@@ -202,9 +126,34 @@ function onMouseDown(e){
     duckIndex--;
     grayDuck(duckIndex);
     player.incrementScoreBy(1);
-    scene.remove(intersects[0].object);
+    level.get('scene').remove(intersects[0].object);
     morphs.pop();
     setTimeout(function(){CreateBirdModel()},500);
+  }
+}
+
+function generateScoreBoard(){
+  window.app.Shots = window.document.getElementById('shotsleft');
+  app.Shots.innerHTML = player.get('bullets');
+  window.app.Score = window.document.getElementById('score');
+  app.Score.innerHTML = player.get('score');
+  window.document.getElementById('playername').innerHTML = player.get('name');
+  window.app.Level = window.document.getElementById('level');
+  app.Level.innerHTML = level.get('number') ;
+}
+
+function updateScoreBoard(){
+  app.Score.innerHTML = player.get('score');
+  app.Shots.innerHTML = player.get('bullets');
+  app.Level.innerHTML = level.number;
+}
+
+function generateDuckCounter(){
+  duckIndex = level.get('numberBirds');
+  var dcounter = document.getElementsByClassName('duckcounter')[0];
+  dcounter.innerHTML = '';
+  for(var i = 0; i < duckIndex; i++){
+    dcounter.innerHTML += "<img src= 'images/gduck.jpg' class='duckIMG' />"
   }
 }
 
@@ -213,29 +162,16 @@ function onMouseUp(e){
   document.body.style.cursor = 'crosshair';
 }
 
-function flash(){
-  var flash = new THREE.AmbientLight(0xFFFFFF,10);
-  scene.add(flash);
-  setTimeout(function(){scene.remove(flash)},70);
-}
-
-function outOfView(){
-  scene.remove(bird.get('threeBird'));
-  morphs.pop();
-  CreateBirdModel();
-  duckIndex--;
-}
-
-function updateLevel(){
-  if(levelCounter == levelstats[level][4]){ 
-    level++;
-    levelCounter = 0;
-    app.skyColor = Math.random() * 0xFFFFFF;
-    scene = new app.View.Scene();
-    generateGun();
-    generateDuckCounter();
-  }
-}
+// function updateLevel(){
+//   if(levelCounter == levelstats[level][4]){ 
+//     level++;
+//     levelCounter = 0;
+//     app.skyColor = Math.random() * 0xFFFFFF;
+//     scene = new app.View.Scene();
+//     generateGun();
+//     generateDuckCounter();
+//   }
+// }
 
 function checkIndex(){
   if(duckIndex == 0)
@@ -264,10 +200,10 @@ function render() {
 
   var delta = clock.getDelta();
 
-  camera.lookAt( scene.scene.position );
+  level.get('scene').camera.lookAt( level.get('scene').scene.position );
   // camera.rotateX((1 - app.vertLook) *Math.PI/2)
   if(newgun != undefined){
-    newgun.lookAt( scene.scene.position );
+    newgun.lookAt( level.get('scene').scene.position );
     newgun.rotateY((((app.horzLook)*-2))* Math.PI/2);
     newgun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
     newgun.rotateY(0);
@@ -277,35 +213,31 @@ function render() {
   if(skyPlane.position.x > 600)
     skyPlane.position.x = 0;
   checkIndex();
-  updateLevel();
+  // updateLevel();
   if(bird.get('threeBird') != undefined){
-    bird.fly();
-    bird.updateTarget();
+    birdPos = bird.get('position');
+    if((birdPos.y > (window.idealHeight / 10)) || birdPos.x > (window.idealwidth / 5) || birdPos.x < -(window.idealwidth/5)) {
+      level.get('scene').outOfView();
+    }
+    else{  
+      bird.fly();
+      bird.updateTarget();
+    }
   }
-
   for ( var i = 0; i < morphs.length; i ++ ) {
     morph = morphs[ i ];
     morph.updateAnimation( 1000 * delta );
   }
-
-  renderer.render( scene.scene, camera );
+  renderer.render( level.get('scene').scene, level.get('scene').camera );
   // effect.render(scene, camera);
 
 }
 
 function morphColorsToFaceColors( geometry ) {
-
   if ( geometry.morphColors && geometry.morphColors.length ) {
-
     var colorMap = geometry.morphColors[ 0 ];
-
     for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
       geometry.faces[ i ].color = colorMap.colors[ i ];
-
     }
-
   }
-
 }
-
