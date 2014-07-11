@@ -18,10 +18,11 @@ window.levelCounter = 0;
 window.duckIndex = 0;
 var mouse = new THREE.Vector3();
 var projector = new THREE.Projector();
-var camera, scene, renderer, mesh, levels = [];
+var camera,renderer, mesh, levels = [];
 var morph, morphs = [];
 var clock = new THREE.Clock();
 var player = new app.Models.Player();
+var scene = new app.Views.Scene();
 
 init();
 render();
@@ -70,34 +71,15 @@ function CreateGunModel(){
   } );
 }
 
-function CreateTreeModel(){
-  var loader = new THREE.JSONLoader();
-  loader.load( "models/tree.js", function( geometry ) {
-    var materialScene = new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading } );
-    treeMesh = new THREE.Mesh( geometry, materialScene );
-    treeMesh.position.set(app.randomNum(-100,100),10,app.randomNum(0,80));
-
-    var sc = app.randomNum(40,80);
-    treeMesh.scale.set( sc, sc, sc );
-
-    treeMesh.matrixAutoUpdate = false;
-    treeMesh.updateMatrix();
-
-    scene.add( treeMesh );
-
-  } );
-}
-
 function init() {
   document.body.style.cursor = 'crosshair';
   camera = new THREE.PerspectiveCamera( 60, idealwidth / idealHeight, 1, 1000 );
   camera.position.set( 0, 50, 205 );
-  createScenery();
   generateScoreBoard();
   generateDuckCounter();
   generateGun();
   CreateBirdModel();
-  CreateTreeModel();
+  generateLevels(); 
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.sortObjects = false;
   renderer.setClearColor( 0x7ec0ee );
@@ -129,6 +111,27 @@ function init() {
   effect.setSize( idealwidth, idealHeight );
 }
 
+function generateLevels(){
+  var i = 0;
+  while(i<10){
+    switch(i){
+      case 0: 
+        console.log(0);
+        break;
+      case 1:
+        console.log(1);
+        break;
+      case 2:
+        console.log(2);
+        break;
+      default:
+        console.log('default');
+        break;
+    }
+    i++;
+  }
+}
+
 function onWindowResize() {
   camera.aspect = idealwidth / idealHeight;
   camera.updateProjectionMatrix();
@@ -136,89 +139,6 @@ function onWindowResize() {
   renderer.setSize( idealwidth, idealHeight );
   // effect.setSize( window.innerWidth, window.innerHeight );
 }
-
-function createScenery(){
-  scene = new THREE.Scene();
-  scene.fog = new THREE.Fog( 0xEBEBEB, 0, 900);
-  skytexture = THREE.ImageUtils.loadTexture("images/cloud.jpg");
-  skytexture.wrapS = THREE.RepeatWrapping;
-  skytexture.wrapT = THREE.RepeatWrapping;
-  skytexture.repeat.set(0.7,0.3);
-  skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * idealwidth, idealHeight), new THREE.MeshBasicMaterial({color: app.skyColor, map: skytexture}));
-  skyPlane.position.z -= 150;
-  window.sky = skyPlane;
-  scene.add(skyPlane);
-  DrawGrass();
-  DrawSun();
-  DrawBushes();
-  DrawTrees();
-}
-
-function DrawGrass(){
-    var grasstexture = THREE.ImageUtils.loadTexture("images/grass.jpg");
-    grasstexture.wrapS = THREE.RepeatWrapping;
-    grasstexture.wrapT = THREE.RepeatWrapping;
-    grasstexture.repeat.set(4,4);
-    var newplane = new THREE.Mesh( new THREE.PlaneGeometry(idealwidth,255), new THREE.MeshLambertMaterial({color: 0x003300, map:grasstexture}));
-    
-    newplane.position.z +=30;
-    newplane.rotation.x = - Math.PI / 2;
-    scene.add(newplane);
-}
-
-function DrawSun(){
-  // scene.add(new THREE.HemisphereLight(app.skyColor, 0x00FF00, 5))
-  var dirLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
-  dirLight.color.setHSL( 0.1, 1, 0.95 );
-  dirLight.position.set( 0, 1.75, 1 );
-  dirLight.position.multiplyScalar( 50 );
-
-  dirLight.castShadow = true;
-  dirLight.shadowMapWidth = 2048;
-  dirLight.shadowMapHeight = 2048;
-  
-  var d = 50;
-
-  dirLight.shadowCameraLeft = -d;
-  dirLight.shadowCameraRight = d;
-  dirLight.shadowCameraTop = d;
-  dirLight.shadowCameraBottom = -d;
-
-  dirLight.shadowCameraFar = 3500;
-  dirLight.shadowBias = -0.0001;
-  dirLight.shadowDarkness = 0.35;
-
-  scene.add( dirLight );
-
-  suntexture = THREE.ImageUtils.loadTexture("images/sun.jpg");
-  suntexture.wrapS = THREE.RepeatWrapping;
-  suntexture.wrapT = THREE.RepeatWrapping;
-  suntexture.repeat.set(3,3);
-
-  var sunsphere = new THREE.Mesh( new THREE.SphereGeometry(100,100,100), new THREE.MeshLambertMaterial({color: 'yellow'}));
-  sunsphere.position.z=-200;
-  scene.add(sunsphere);
-}
-
-function DrawBushes(){
-  var bush;
-  bushtexture = THREE.ImageUtils.loadTexture("images/bush.png");
-  bushtexture.wrapS = THREE.RepeatWrapping;
-  bushtexture.wrapT = THREE.RepeatWrapping;
-  bushtexture.repeat.set(8,8);
-  for(var i = 0; i < 20; i++){
-    bush = new THREE.Mesh(new THREE.BoxGeometry(20,8,10), new THREE.MeshLambertMaterial({color:0x004000, map:bushtexture}));
-    bush.position.set((20*i -200),30,140);
-    scene.add(bush);
-  }
-}
-
-function DrawTrees(){
-  var numTrees = app.randomNum(2,4);
-  for(var i = 1; i < numTrees; i++){
-    CreateTreeModel();
-  }
- }
 
 function generateScoreBoard(){
   window.app.Shots = window.document.getElementById('shotsleft');
@@ -299,17 +219,6 @@ function flash(){
   setTimeout(function(){scene.remove(flash)},70);
 }
 
-// function isNearTarget() {
-//   if (bird.get('threeBird') == void 0) {
-//     return 
-//   }
-
-//   var p       = bird.get("path")[index];
-//   var birdPos = bird.get('threeBird').position;
-
-//   return (Math.abs(p.x - birdPos.x) < 4) && (Math.abs(p.y - birdPos.y)) < 1
-// }
-
 function outOfView(){
   scene.remove(bird.get('threeBird'));
   morphs.pop();
@@ -322,7 +231,7 @@ function updateLevel(){
     level++;
     levelCounter = 0;
     app.skyColor = Math.random() * 0xFFFFFF;
-    createScenery();
+    scene = new app.View.Scene();
     generateGun();
     generateDuckCounter();
   }
@@ -355,10 +264,10 @@ function render() {
 
   var delta = clock.getDelta();
 
-  camera.lookAt( scene.position );
+  camera.lookAt( scene.scene.position );
   // camera.rotateX((1 - app.vertLook) *Math.PI/2)
   if(newgun != undefined){
-    newgun.lookAt( scene.position );
+    newgun.lookAt( scene.scene.position );
     newgun.rotateY((((app.horzLook)*-2))* Math.PI/2);
     newgun.rotateZ((1 - app.vertLook) * (Math.PI - 2)/2);
     newgun.rotateY(0);
@@ -379,7 +288,7 @@ function render() {
     morph.updateAnimation( 1000 * delta );
   }
 
-  renderer.render( scene, camera );
+  renderer.render( scene.scene, camera );
   // effect.render(scene, camera);
 
 }

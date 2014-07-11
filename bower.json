@@ -3,6 +3,7 @@
   "dependencies": {
     "backbone": "~1.1.2",
     "three.js": "git@github.com:mrdoob/three.js.git",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "jquery": "~2.1.1"
   }
 }

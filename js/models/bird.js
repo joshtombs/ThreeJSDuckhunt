@@ -53,7 +53,7 @@ window.app = window.app || {};
       var velocity = this.get('velocity');
       this.get('threeBird').lookAt( new THREE.Vector3( this.get('path')[index].x, this.get('path')[index].y, this.get('path')[index].z) );
       if((birdPos.y > (window.idealHeight / 10)) || birdPos.x > (window.idealwidth / 5) || birdPos.x < -(window.idealwidth/5)) {
-        outOfView(this.get('threeBird'));
+        this.get('scene').outOfView(this.get('threeBird'));
       }
       else {      
         if((birdPos.x < birdPath.x ) && (Math.abs(birdPos.x - birdPath.x) > 1))
