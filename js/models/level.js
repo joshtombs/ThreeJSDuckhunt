@@ -16,7 +16,9 @@ window.app = window.app || {};
         window.level++;
     },
     start: function(){
-      this.set('scene', new app.Views.Scene());
+      this.set('scene', new app.Views.Scene({
+        skyColor: this.skyColor
+      }));
     }
   })
 })(window.app, Backbone)

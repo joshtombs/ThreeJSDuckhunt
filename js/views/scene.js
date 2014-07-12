@@ -2,7 +2,7 @@ window.app = window.app || {};
 ;(function(App, Backbone, THREE){
   app.Views = app.View || {};
   app.Views.Scene = Backbone.View.extend({
-    initialize: function(){
+    initialize: function(options){
       this.scene = new THREE.Scene();
       this.camera = new THREE.PerspectiveCamera( 60, app.idealWidth / app.idealHeight, 1, 1000 );
       this.camera.position.set( 0, 50, 205 );
@@ -11,7 +11,7 @@ window.app = window.app || {};
       skytexture.wrapS = THREE.RepeatWrapping;
       skytexture.wrapT = THREE.RepeatWrapping;
       skytexture.repeat.set(0.7,0.3);
-      skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * app.idealWidth, app.idealHeight), new THREE.MeshBasicMaterial({color: app.skyColor, map: skytexture}));
+      skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * app.idealWidth, app.idealHeight), new THREE.MeshBasicMaterial({color: options.skyColor, map: skytexture}));
       skyPlane.position.z -= 150;
       this.sky = skyPlane;
       this.morphs = [];

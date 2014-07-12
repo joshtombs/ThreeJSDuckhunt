@@ -13,7 +13,6 @@ window.document.addEventListener("mousemove", onMouseMove);
 window.document.addEventListener("mousedown", onMouseDown);
 window.document.addEventListener("mouseup", onMouseUp);
 
-window.app.skyColor = 0x6E91FF;
 window.index = 0;
 window.levelstats = [[0.1,0.1,0,30,3],[0.1,0.1,0,50,4],[0.2,0.2,0.2,40,5],[0.3,0.3,0.2,50,6],[0.3,0.3,0.3,60,6],[0.4,0.4,0.3,60,6]];
 window.level = 0;
@@ -148,7 +147,6 @@ function onMouseUp(e){
 //   if(levelCounter == levelstats[level][4]){ 
 //     level++;
 //     levelCounter = 0;
-//     app.skyColor = Math.random() * 0xFFFFFF;
 //     scene = new app.View.Scene();
 //     generateGun();
 //     generateDuckCounter();
