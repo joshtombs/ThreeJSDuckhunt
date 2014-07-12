@@ -14,14 +14,13 @@ window.document.addEventListener("mousedown", onMouseDown);
 window.document.addEventListener("mouseup", onMouseUp);
 
 window.index = 0;
-window.levelstats = [[0.1,0.1,0,30,3],[0.1,0.1,0,50,4],[0.2,0.2,0.2,40,5],[0.3,0.3,0.2,50,6],[0.3,0.3,0.3,60,6],[0.4,0.4,0.3,60,6]];
+// window.levelstats = [[0.1,0.1,0,30,3],[0.1,0.1,0,50,4],[0.2,0.2,0.2,40,5],[0.3,0.3,0.2,50,6],[0.3,0.3,0.3,60,6],[0.4,0.4,0.3,60,6]];
 window.level = 0;
-window.levelCounter = 0;
 window.duckIndex = 0;
 
 var mouse = new THREE.Vector3();
 var projector = new THREE.Projector();
-var renderer, mesh, levels = [];
+var renderer, mesh;
 var clock = new THREE.Clock();
 var player = new app.Models.Player();
 var level = new app.Models.Level();
@@ -103,7 +102,7 @@ function onMouseDown(e){
     setTimeout(function(){player.reload()}, 2500);
   }
   if ( intersects.length > 0 ) {
-    levelCounter++;
+    level.set('birdsShot', level.get('birdsShot')++);
     duckIndex--;
     grayDuck(duckIndex);
     player.incrementScoreBy(1);
@@ -144,9 +143,9 @@ function onMouseUp(e){
 }
 
 // function updateLevel(){
-//   if(levelCounter == levelstats[level][4]){ 
+//   if(level.get('birdsShot') == levelstats[level][4]){ 
 //     level++;
-//     levelCounter = 0;
+//     level.get('birdsShot') = 0;
 //     scene = new app.View.Scene();
 //     generateGun();
 //     generateDuckCounter();
@@ -155,13 +154,13 @@ function onMouseUp(e){
 
 function checkIndex(){
   if(duckIndex == 0)
-    if( (levelstats[level][4] - levelCounter) > 0 )
+    if( (level.get('numberBirds') - level.get('birdsShot')) > 0 )
       findMissedBird();
 }
 
 function findMissedBird(){
   var ducks = document.getElementsByTagName('img');
-  for(var i = 0 ; i >= levelstats[level][4] - 1; i++){
+  for(var i = 0 ; i >= level.get('numberBirds') - 1; i++){
     var b = ducks[i].src;
     if( (b.indexOf('gduck.jpg') > -1) ){
       duckIndex = i;
