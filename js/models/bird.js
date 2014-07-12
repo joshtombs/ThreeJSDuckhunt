@@ -37,10 +37,11 @@ window.app = window.app || {};
     generatePath: function(){
       var b = this.get('threeBird').position.y, i = 0;
       this.set('path', []);
-      while(b < (window.idealHeight/10 + 20 )){
+      var levelmax = 30;
+      while(b < (app.idealHeight/10 + 20 )){
         b += 5;
         this.get('path')[i] = {
-          x: app.randomNum(this.get('threeBird').position.x - /*levelmax*/, this.get('threeBird').position.x + /*levelmax*/),
+          x: app.randomNum(this.get('threeBird').position.x - levelmax, this.get('threeBird').position.x + levelmax),
           y: app.randomNum(b - 10, b + 10), 
           z: app.randomNum(60, 120)
         };

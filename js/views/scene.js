@@ -4,14 +4,14 @@ window.app = window.app || {};
   app.Views.Scene = Backbone.View.extend({
     initialize: function(){
       this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera( 60, idealwidth / idealHeight, 1, 1000 );
+      this.camera = new THREE.PerspectiveCamera( 60, app.idealWidth / app.idealHeight, 1, 1000 );
       this.camera.position.set( 0, 50, 205 );
       this.scene.fog = new THREE.Fog( 0xEBEBEB, 0, 900);
       skytexture = THREE.ImageUtils.loadTexture("images/cloud.jpg");
       skytexture.wrapS = THREE.RepeatWrapping;
       skytexture.wrapT = THREE.RepeatWrapping;
       skytexture.repeat.set(0.7,0.3);
-      skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * idealwidth, idealHeight), new THREE.MeshBasicMaterial({color: app.skyColor, map: skytexture}));
+      skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * app.idealWidth, app.idealHeight), new THREE.MeshBasicMaterial({color: app.skyColor, map: skytexture}));
       skyPlane.position.z -= 150;
       this.sky = skyPlane;
       this.morphs = [];
@@ -28,7 +28,7 @@ window.app = window.app || {};
       grasstexture.wrapS = THREE.RepeatWrapping;
       grasstexture.wrapT = THREE.RepeatWrapping;
       grasstexture.repeat.set(4,4);
-      var newplane = new THREE.Mesh( new THREE.PlaneGeometry(idealwidth,255), new THREE.MeshLambertMaterial({color: 0x003300, map:grasstexture}));
+      var newplane = new THREE.Mesh( new THREE.PlaneGeometry(app.idealWidth,255), new THREE.MeshLambertMaterial({color: 0x003300, map:grasstexture}));
       
       newplane.position.z +=30;
       newplane.rotation.x = - Math.PI / 2;
@@ -109,15 +109,15 @@ window.app = window.app || {};
     createBirdModel: function(){
       this.bird = new app.Models.Bird({
         position: {
-          x: app.randomNum((-idealwidth/20),(idealwidth/20)),
+          x: app.randomNum((-app.idealWidth/20),(app.idealWidth/20)),
           y: 25,
           z: app.randomNum(50,110)
         },
         scene: this.scene
       });
       this.bird.generateBird(function(bird){
-        scene.add(bird);
-        morphs.push(bird);
+        this.add(bird);
+        this.morphs.push(bird);
       });
       index = 0;
     },
