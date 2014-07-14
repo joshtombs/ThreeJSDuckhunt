@@ -14,7 +14,6 @@ window.document.addEventListener("mousedown", onMouseDown);
 window.document.addEventListener("mouseup", onMouseUp);
 
 window.index = 0;
-// window.levelstats = [[0.1,0.1,0,30,3],[0.1,0.1,0,50,4],[0.2,0.2,0.2,40,5],[0.3,0.3,0.2,50,6],[0.3,0.3,0.3,60,6],[0.4,0.4,0.3,60,6]];
 window.duckIndex = 0;
 
 var mouse = new THREE.Vector3();
@@ -93,6 +92,7 @@ var player = new app.Models.Player();
 var level = new app.Models.Level({
   skyColor: 0x5EE76E
 });
+
 init();
 render();  
 
@@ -103,11 +103,10 @@ function init() {
     levelmodel: level
   });
   scoreboard.render();
-  
-  // var birdDisplay = new app.Views.birdDisplay({
-  //   model: level
-  // });
-  // birdDisplay.render();
+  var birdDisplay = new app.Views.birdDisplay({
+    model: level
+  });
+  birdDisplay.render();
   
   level.start();
   renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -159,11 +158,11 @@ function onMouseMove(e){
 
 function onMouseDown(e){
   e.preventDefault();
-  // var audio;
+  var audio;
   if(player.clipEmpty()){
-    // audio = document.getElementById('empty');
-    // audio.load();
-    // audio.play();
+    audio = document.getElementById('empty');
+    audio.load();
+    audio.play();
     return
   }
   document.body.style.cursor = 'crosshair';
@@ -179,7 +178,7 @@ function onMouseDown(e){
     player.incrementScoreBy(1);
     level.get('scene').remove(intersects[0].object);
     level.get('scene').morphs.pop();
-    setTimeout(function(){ level.get('scene').  createBirdModel()},500);
+    setTimeout(function(){ level.get('scene').createBirdModel()},500);
   }
 }
 
