@@ -38,7 +38,7 @@ window.app = window.app || {};
       var b = this.get('threeBird').position.y, i = 0;
       this.set('path', []);
       var levelmax = 30;
-      while(b < (app.idealHeight/10 + 20 )){
+      while(b < 100 ){
         b += 5;
         this.get('path')[i] = {
           x: app.randomNum(this.get('threeBird').position.x - levelmax, this.get('threeBird').position.x + levelmax),
@@ -54,23 +54,23 @@ window.app = window.app || {};
       var velocity = this.get('velocity');
       this.get('threeBird').lookAt( new THREE.Vector3( this.get('path')[index].x, this.get('path')[index].y, this.get('path')[index].z) );
       if((birdPos.x < birdPath.x ) && (Math.abs(birdPos.x - birdPath.x) > 1))
-        birdPos.x += velocity.x;
+        birdPos.x += this.get('velocity').x;
       else if((birdPos.x > birdPath.x)  && (Math.abs(birdPos.x - birdPath.x) > 1))
-        birdPos.x -= velocity.x;
+        birdPos.x -= this.get('velocity').x;
       if((birdPos.y < birdPath.y) && (Math.abs(birdPos.x - birdPath.y) > .8))
-        birdPos.y += velocity.y;
+        birdPos.y += this.get('velocity').y;
       else if((birdPos.y > birdPath.y) && (Math.abs(birdPos.y - birdPath.y) > .8))
-        birdPos.y -= velocity.y;
+        birdPos.y -= this.get('velocity').y;
       if((birdPos.z < birdPath.z) && (Math.abs(birdPos.z - birdPath.z) > 1))
-        birdPos.z += velocity.z;
+        birdPos.z += this.get('velocity').z;
       else if((birdPos.z > birdPath.z)  && (Math.abs(birdPos.z - birdPath.z) > 1))
-        birdPos.z -= velocity.z;
+        birdPos.z -= this.get('velocity').z;
     },
     updateTarget: function(){
-      var p       = bird.get("path")[index];
-      if(bird.get('threeBird') == void 0)
+      var p       = this.get("path")[index];
+      if(this.get('threeBird') == void 0)
         return  
-      var birdPos = bird.get('threeBird').position;
+      var birdPos = this.get('threeBird').position;
       if((Math.abs(p.x - birdPos.x) < 4) && (Math.abs(p.y - birdPos.y)) < 1)
         window.index++;
     }

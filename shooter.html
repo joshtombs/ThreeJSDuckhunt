@@ -6,28 +6,36 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/app.css">
-  </head>
-  <body>
-    <div class='scoreboard'>
-      <h3 id='playername'>Player Name</h3>
-      <p class='shotsleft'>Shots:
-        <span id='shotsleft'></span>
-      </p>
-      <p class='score'>Score:
-        <span id='score'></span>
-      </p>
-      <p class='level'>Level:
-        <span id='level'></span>
-      </p>
+    <script type='text/template' id='scoreboard-template'>
+      <div class='scoreboard'>
+        <h3 id='playername'>Player Name</h3>
+        <p class='shotsleft'>Shots:
+          <span id='shotsleft'><%-bullets %></span>
+        </p>
+        <p class='score'>Score:
+          <span id='score'><%-score %></span>
+        </p>
+        <p class='level'></p>
         <audio id='fired' src="shot.mp3" ></audio>
         <audio id='reload' src="reload.mp3" ></audio>
-    </div>
-    <div class='duckcounter'>
-    </div>
+        <audio id='empty' srec="empty.mp3"></audio>
+      </div> 
+    </script>
+    <script type='text/template' id='level-template'>
+      Level: <span id='level'><%-number %>
+    </script>
+    <script type='text/template' id='birdDisplay-template'>
+    <div class='duckcounter'></div>
+    </script>
+
+  </head>
+  <body>
+    <div class="score-board"></div>
+    <div class="bird-display"></div>
     <script src="bower_components/jquery/dist/jquery.js"></script>        
     <script src="bower_components/three.js/build/three.js"></script>    
     <script src="bower_components/lodash/dist/lodash.js"></script>    
-    <script src="bower_components/backbone/backbone.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>    
     <script src="js/Detector.js"></script>
     <script src="js/effects/OculusRiftEffect.js"></script>
    <!--  <script src="js/EffectsComposer.js"></script>
@@ -41,8 +49,12 @@
     <script src="shaders/ShaderPass.js"></script> -->
     <script src='js/models/player.js'></script>
     <script src='js/models/bird.js'></script>
-    <script src='js/views/scene.js'></script>    
-    <script src='js/models/level.js'></script>    
+    <script src='js/views/scene.js'></script> 
+    <script src='js/models/level.js'></script> 
+    <script src='js/collections/levels.js'></script>    
+    <script src='js/views/levelinfo.js'></script>   
+    <script src='js/views/scoreboard.js'></script>
+    <script src='js/views/birdDisplay.js'></script>   
     <script src='app.js'></script>
 
   </body>

@@ -1,7 +1,7 @@
 window.app = window.app || {};
 ;(function(App, Backbone, THREE){
-  app.Views = app.View || {};
-  app.Views.Scene = Backbone.View.extend({
+  App.Views = App.Views || {};
+  App.Views.Scene = Backbone.View.extend({
     initialize: function(options){
       this.scene = new THREE.Scene();
       this.camera = new THREE.PerspectiveCamera( 60, app.idealWidth / app.idealHeight, 1, 1000 );
@@ -98,14 +98,12 @@ window.app = window.app || {};
         })
       }
     },
-    
     add: function(obj){
       this.scene.add(obj);
     },
     remove: function(obj){
       this.scene.remove(obj);
     },
-
     createBirdModel: function(){
       this.bird = new app.Models.Bird({
         position: {
@@ -115,13 +113,13 @@ window.app = window.app || {};
         },
         scene: this.scene
       });
+      _this = this;
       this.bird.generateBird(function(bird){
-        this.add(bird);
-        this.morphs.push(bird);
+        _this.add(bird);
+        _this.morphs.push(bird);
       });
       index = 0;
     },
-
     createGunModel: function(){
       var loader = new THREE.JSONLoader();
       _this = this;
@@ -147,17 +145,16 @@ window.app = window.app || {};
         _this.add( _this.gun );
       });
     },
-
     flash: function(){
       var flash = new THREE.AmbientLight(0xFFFFFF,10);
       this.add(flash);
-      setTimeout(function(){this.remove(flash)},70);
+      _this = this;
+      setTimeout(function(){_this.remove(flash)},70);
     },
-
     outOfView: function(){
-      this.remove(this.bird);
-      morphs.pop();
-      createBirdModel();
+      this.remove(this.bird.get('threeBird'));
+      this.morphs.pop();
+      this.createBirdModel();
       this.duckIndex--;
     }
 
