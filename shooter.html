@@ -27,11 +27,17 @@
     <script type='text/template' id='birdDisplay-template'>
     <div class='duckcounter'></div>
     </script>
+    <script type='text/template' id='playerInfo-template'>
+    <div class='playerinfo'>
+      <h1> Some real cool player info </h1>
+    </div>
+    </script>
 
   </head>
   <body>
     <div class="score-board"></div>
     <div class="bird-display"></div>
+    <div class="player-info"></div>
     <script src="bower_components/jquery/dist/jquery.js"></script>        
     <script src="bower_components/three.js/build/three.js"></script>    
     <script src="bower_components/lodash/dist/lodash.js"></script>    
@@ -47,6 +53,7 @@
     <script src="shaders/RGBShiftShader.js"></script>
     <script src="shaders/FilmShader.js"></script>
     <script src="shaders/ShaderPass.js"></script> -->
+    <script src='js/utils.js'></script>
     <script src='js/models/player.js'></script>
     <script src='js/models/bird.js'></script>
     <script src='js/views/scene.js'></script> 
@@ -54,7 +61,9 @@
     <script src='js/collections/levels.js'></script>    
     <script src='js/views/levelinfo.js'></script>   
     <script src='js/views/scoreboard.js'></script>
-    <script src='js/views/birdDisplay.js'></script>   
+    <script src='js/views/playerinfo.js'></script>
+    <script src='js/views/birdDisplay.js'></script>
+    <script src='js/models/game.js'></script>   
     <script src='app.js'></script>
   </body>
 </html>

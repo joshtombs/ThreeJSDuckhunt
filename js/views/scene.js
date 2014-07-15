@@ -68,34 +68,20 @@ window.app = window.app || {};
     },
     DrawBushes: function(){
       var bush;
-      bushtexture = THREE.ImageUtils.loadTexture("images/bush.png");
-      bushtexture.wrapS = THREE.RepeatWrapping;
-      bushtexture.wrapT = THREE.RepeatWrapping;
-      bushtexture.repeat.set(8,8);
+      _this = this;
       for(var i = 0; i < 20; i++){
-        bush = new THREE.Mesh(new THREE.BoxGeometry(20,8,10), new THREE.MeshLambertMaterial({color:0x004000, map:bushtexture}));
-        bush.position.set((20*i -200),30,140);
-        this.scene.add(bush);
+        var tempBush = App.Utils.AnimMorphs[3];
+        tempBush.position.set(app.randomNum(-100,100),10,140);
+        this.add(tempBush);
       }
     },
     DrawTrees: function(){
       var numTrees = app.randomNum(2,4);
       _this = this;
       for(var i = 1; i < numTrees; i++){
-        var loader = new THREE.JSONLoader();
-        loader.load( "models/tree.js", function( geometry ) {
-          var materialScene = new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading } );
-          treeMesh = new THREE.Mesh( geometry, materialScene );
-          treeMesh.position.set(app.randomNum(-100,100),10,app.randomNum(0,80));
-
-          var sc = app.randomNum(40,80);
-          treeMesh.scale.set( sc, sc, sc );
-
-          treeMesh.matrixAutoUpdate = false;
-          treeMesh.updateMatrix();
-
-          _this.add( treeMesh );
-        })
+        var tempTree = App.Utils.AnimMorphs[2];
+        tempTree.position.set(app.randomNum(-100,100),10,app.randomNum(0,80));
+        this.add(tempTree)
       }
     },
     add: function(obj){
@@ -121,29 +107,8 @@ window.app = window.app || {};
       index = 0;
     },
     createGunModel: function(){
-      var loader = new THREE.JSONLoader();
-      _this = this;
-      loader.load( "models/hyperblaster.js", function( geometry ) {
-        morphColorsToFaceColors( geometry );
-        geometry.computeMorphNormals();
-        var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-        var gun = new THREE.MorphAnimMesh( geometry, material );
-
-        gun.duration = 1000;
-
-        var s = 0.75;
-        gun.scale.set( s, s, s );
-        gun.position.set(11,30,200);
-
-        gun.rotation.y = -5;
-        gun.rotation.x = 6;
-        gun.rotation.z = 5;
-
-        gun.castShadow = true;
-        gun.receiveShadow = true;
-        _this.gun = gun;
-        _this.add( _this.gun );
-      });
+      this.gun = App.Utils.AnimMorphs[1];
+      this.add(this.gun);      
     },
     flash: function(){
       var flash = new THREE.AmbientLight(0xFFFFFF,10);

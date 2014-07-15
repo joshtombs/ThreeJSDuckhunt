@@ -10,29 +10,10 @@ window.app = window.app || {};
       path: []
     },
     generateBird: function(cb){
-      var _this = this;
-      var loader = new THREE.JSONLoader();
-      loader.load( "models/stork.js", function( geometry ) {
-
-        morphColorsToFaceColors( geometry );
-        geometry.computeMorphNormals();
-
-        var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xC0C0C0, shininess: 5, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-        var threeBird = new THREE.MorphAnimMesh( geometry, material );
-        threeBird.duration = _this.get('animDuration');
-
-        var s = _this.get('scale');
-        threeBird.scale.set( s, s, s );
-        threeBird.position.set(_this.get('position').x, _this.get('position').y,_this.get('position').z);
-        threeBird.rotation.y = -1;
-        threeBird.castShadow = true;
-        threeBird.receiveShadow = true;
-
-        threeBird.velocity = _this.get('velocity');
-        _this.set('threeBird', threeBird);
-        _this.generatePath();
-        cb(_this.get('threeBird'));
-      });
+      this.set('threeBird', App.Utils.AnimMorphs[0]);
+      this.get('threeBird').position.set(this.get('position').x, this.get('position').y, this.get('position').z);      
+      this.generatePath();
+      cb(this.get('threeBird'));
     },
     generatePath: function(){
       var b = this.get('threeBird').position.y, i = 0;
