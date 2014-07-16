@@ -10,8 +10,11 @@ window.app = window.app || {};
       path: []
     },
     generateBird: function(cb){
-      this.set('threeBird', App.Utils.AnimMorphs[0]);
-      this.get('threeBird').position.set(this.get('position').x, this.get('position').y, this.get('position').z);      
+      this.set('threeBird', App.Utils.AnimMorphs[0].clone());
+      // this.get('threeBird').position.set(this.get('position').x, this.get('position').y, this.get('position').z);      
+      this.get('threeBird').duration = this.get('animDuration');
+      var s = this.get('scale');
+      this.get('threeBird').scale.set( s, s, s );
       this.generatePath();
       cb(this.get('threeBird'));
     },
@@ -22,9 +25,9 @@ window.app = window.app || {};
       while(b < 100 ){
         b += 5;
         this.get('path')[i] = {
-          x: app.randomNum(this.get('threeBird').position.x - levelmax, this.get('threeBird').position.x + levelmax),
-          y: app.randomNum(b - 10, b + 10), 
-          z: app.randomNum(60, 120)
+          x: app.Utils.randomNum(this.get('threeBird').position.x - levelmax, this.get('threeBird').position.x + levelmax),
+          y: app.Utils.randomNum(b - 10, b + 10), 
+          z: app.Utils.randomNum(60, 120)
         };
         i++;
       }

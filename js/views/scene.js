@@ -4,14 +4,14 @@ window.app = window.app || {};
   App.Views.Scene = Backbone.View.extend({
     initialize: function(options){
       this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera( 60, app.idealWidth / app.idealHeight, 1, 1000 );
+      this.camera = new THREE.PerspectiveCamera( 60, app.Utils.idealWidth / app.Utils.idealHeight, 1, 1000 );
       this.camera.position.set( 0, 50, 205 );
       this.scene.fog = new THREE.Fog( 0xEBEBEB, 0, 900);
       skytexture = THREE.ImageUtils.loadTexture("images/cloud.jpg");
       skytexture.wrapS = THREE.RepeatWrapping;
       skytexture.wrapT = THREE.RepeatWrapping;
       skytexture.repeat.set(0.7,0.3);
-      skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * app.idealWidth, app.idealHeight), new THREE.MeshBasicMaterial({color: options.skyColor, map: skytexture}));
+      skyPlane = new THREE.Mesh( new THREE.PlaneGeometry(4 * app.Utils.idealWidth, app.Utils.idealHeight), new THREE.MeshBasicMaterial({color: options.skyColor, map: skytexture}));
       skyPlane.position.z -= 150;
       this.sky = skyPlane;
       this.morphs = [];
@@ -28,7 +28,7 @@ window.app = window.app || {};
       grasstexture.wrapS = THREE.RepeatWrapping;
       grasstexture.wrapT = THREE.RepeatWrapping;
       grasstexture.repeat.set(4,4);
-      var newplane = new THREE.Mesh( new THREE.PlaneGeometry(app.idealWidth,255), new THREE.MeshLambertMaterial({color: 0x003300, map:grasstexture}));
+      var newplane = new THREE.Mesh( new THREE.PlaneGeometry(app.Utils.idealWidth,255), new THREE.MeshLambertMaterial({color: 0x003300, map:grasstexture}));
       
       newplane.position.z +=30;
       newplane.rotation.x = - Math.PI / 2;
@@ -70,17 +70,17 @@ window.app = window.app || {};
       var bush;
       _this = this;
       for(var i = 0; i < 20; i++){
-        var tempBush = App.Utils.AnimMorphs[3];
-        tempBush.position.set(app.randomNum(-100,100),10,140);
+        var tempBush = App.Utils.AnimMorphs[3].clone();
+        tempBush.position.set(App.Utils.randomNum(-100,100),10,140);
         this.add(tempBush);
       }
     },
     DrawTrees: function(){
-      var numTrees = app.randomNum(2,4);
+      var numTrees = app.Utils.randomNum(2,4);
       _this = this;
       for(var i = 1; i < numTrees; i++){
-        var tempTree = App.Utils.AnimMorphs[2];
-        tempTree.position.set(app.randomNum(-100,100),10,app.randomNum(0,80));
+        var tempTree = App.Utils.AnimMorphs[2].clone();
+        tempTree.position.set(App.Utils.randomNum(-100,100),10,App.Utils.randomNum(0,80));
         this.add(tempTree)
       }
     },
@@ -93,9 +93,9 @@ window.app = window.app || {};
     createBirdModel: function(){
       this.bird = new app.Models.Bird({
         position: {
-          x: app.randomNum((-app.idealWidth/20),(app.idealWidth/20)),
+          x: app.Utils.randomNum((-app.Utils.idealWidth/20),(app.Utils.idealWidth/20)),
           y: 25,
-          z: app.randomNum(50,110)
+          z: app.Utils.randomNum(50,110)
         },
         scene: this.scene
       });
@@ -107,14 +107,16 @@ window.app = window.app || {};
       index = 0;
     },
     createGunModel: function(){
-      this.gun = App.Utils.AnimMorphs[1];
+      this.gun = App.Utils.AnimMorphs[1].clone();
       this.add(this.gun);      
     },
     flash: function(){
       var flash = new THREE.AmbientLight(0xFFFFFF,10);
       this.add(flash);
-      _this = this;
-      setTimeout(function(){_this.remove(flash)},70);
+      var _this = this;
+      setTimeout(function(){
+        _this.remove(flash)
+      },70);
     },
     outOfView: function(){
       this.remove(this.bird.get('threeBird'));

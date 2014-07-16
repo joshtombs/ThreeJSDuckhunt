@@ -5,7 +5,7 @@ window.duckIndex = 0;
 
 ;(function(){
   init();
-})
+})()
 
 function init() {
   app.Utils.loadAllModels(function(){

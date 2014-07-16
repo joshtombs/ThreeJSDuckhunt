@@ -10,15 +10,16 @@ window.app = window.app || {};
     return num;
   };
   App.Utils.morphColorsToFaceColors = function(geometry){
-    if ( geometry.morphColors && geometry.morphColors.length ) {
-    var colorMap = geometry.morphColors[ 0 ];
-    for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-      geometry.faces[ i ].color = colorMap.colors[ i ];
+    if ( geometry.morphColors && geometry.morphColors.length ){
+      var colorMap = geometry.morphColors[ 0 ];
+      for ( var i = 0; i < colorMap.colors.length; i ++ ) {
+        geometry.faces[ i ].color = colorMap.colors[ i ];
+      }
     }
   };
   App.Utils.loadAllModels = function(cb){
     App.Utils.AnimMorphs = App.Utils.AnimMorphs || [];
-    var loader = THREE.JSONLoader();
+    var loader = new THREE.JSONLoader();
     loader.load( "models/stork.js", function( geometry ) {
 
       App.Utils.morphColorsToFaceColors( geometry );
@@ -26,10 +27,7 @@ window.app = window.app || {};
 
       var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xC0C0C0, shininess: 5, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
       var threeBird = new THREE.MorphAnimMesh( geometry, material );
-      threeBird.duration = _this.get('animDuration');
 
-      var s = _this.get('scale');
-      threeBird.scale.set( s, s, s );
       threeBird.rotation.y = -1;
       threeBird.castShadow = true;
       threeBird.receiveShadow = true;
@@ -63,12 +61,12 @@ window.app = window.app || {};
       });
       treeMesh = new THREE.Mesh( geometry, materialScene );
 
-      var sc = app.randomNum(40,80);
+      var sc = app.Utils.randomNum(40,80);
       treeMesh.scale.set( sc, sc, sc );
       treeMesh.matrixAutoUpdate = false;
       treeMesh.updateMatrix();
       App.Utils.AnimMorphs[2] = treeMesh;
-    })
+    });
     loader.load( "models/bush.js", function( geometry ) {
       bushtexture = THREE.ImageUtils.loadTexture("images/bush.png");
       bushtexture.wrapS = THREE.RepeatWrapping;
@@ -94,7 +92,6 @@ window.app = window.app || {};
 
       App.Utils.AnimMorphs[3] = bushMesh;
     });
-    cb();
+    setTimeout(function(){cb()},200);
   }      
-  }
 })(app, THREE)
