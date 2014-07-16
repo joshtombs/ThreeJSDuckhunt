@@ -136,8 +136,8 @@ window.app = window.app || {};
       birdDisplay.render();      
     },
     onWindowResize: function() {
-      this.get('level').scene.camera.aspect = app.Utils.idealWidth / app.Utils.idealHeight;
-      this.get('level').scene.camera.updateProjectionMatrix();
+      this.get('level').get('scene').camera.aspect = app.Utils.idealWidth / app.Utils.idealHeight;
+      this.get('level').get('scene').camera.updateProjectionMatrix();
 
       this.get('renderer').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
       // effect.setSize( window.innerWidth, window.innerHeight );
@@ -174,10 +174,10 @@ window.app = window.app || {};
         this.get('level').birdsShot = this.get('level').birdsShot + 1;
         duckIndex--;
         // grayDuck(duckIndex);
-        this.get('player').incrementScoreBy(1);
-        this.get('level').scene.remove(intersects[0].object);
-        this.get('level').scene.morphs.pop();
-        setTimeout(function(){ _this.get('level').scene.createBirdModel()},500);
+        app.game.get('player').incrementScoreBy(1);
+        app.game.get('level').get('scene').remove(intersects[0].object);
+        app.game.get('level').get('scene').morphs.pop();
+        setTimeout(function(){ _this.get('level').get('scene').createBirdModel()},500);
       }
     },
     onMouseUp: function(e){

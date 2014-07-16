@@ -5,6 +5,7 @@ window.app = window.app || {};
     initialize: function(options){
       this.scene = new THREE.Scene();
       this.camera = new THREE.PerspectiveCamera( 60, app.Utils.idealWidth / app.Utils.idealHeight, 1, 1000 );
+      console.log(this.camera)
       this.camera.position.set( 0, 50, 205 );
       this.scene.fog = new THREE.Fog( 0xEBEBEB, 0, 900);
       skytexture = THREE.ImageUtils.loadTexture("images/cloud.jpg");
