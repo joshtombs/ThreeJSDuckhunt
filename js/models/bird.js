@@ -10,8 +10,13 @@ window.app = window.app || {};
       path: []
     },
     generateBird: function(cb){
-      this.set('threeBird', App.Utils.AnimMorphs[0].clone());
-      // this.get('threeBird').position.set(this.get('position').x, this.get('position').y, this.get('position').z);      
+      var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xC0C0C0, shininess: 5, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+      var newbird = new THREE.MorphAnimMesh( app.Utils.BirdGeometry, material );
+      newbird.rotation.y = -1;
+      newbird.castShadow = true;
+      newbird.receiveShadow = true;
+      this.set('threeBird', newbird);
+      this.get('threeBird').position.set(this.get('position').x, this.get('position').y, this.get('position').z);      
       this.get('threeBird').duration = this.get('animDuration');
       var s = this.get('scale');
       this.get('threeBird').scale.set( s, s, s );

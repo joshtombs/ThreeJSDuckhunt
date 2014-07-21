@@ -8,11 +8,14 @@ window.duckIndex = 0;
 })()
 
 function init() {
-  app.Utils.loadAllModels(function(){
-    app.game = new app.Models.Game({
+  window.info = new app.Views.PlayerInfo(function(){
+    app.Utils.loadAllModels(function(){
+      app.game = new app.Models.Game({
 
+      });
     });
   });
+  info.render();
 }
 
 // function updateLevel(){

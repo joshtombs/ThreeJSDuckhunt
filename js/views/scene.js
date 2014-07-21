@@ -5,7 +5,6 @@ window.app = window.app || {};
     initialize: function(options){
       this.scene = new THREE.Scene();
       this.camera = new THREE.PerspectiveCamera( 60, app.Utils.idealWidth / app.Utils.idealHeight, 1, 1000 );
-      console.log(this.camera)
       this.camera.position.set( 0, 50, 205 );
       this.scene.fog = new THREE.Fog( 0xEBEBEB, 0, 900);
       skytexture = THREE.ImageUtils.loadTexture("images/cloud.jpg");
@@ -68,21 +67,44 @@ window.app = window.app || {};
       this.scene.add(sunsphere);
     },
     DrawBushes: function(){
-      var bush;
-      _this = this;
+      var bushMesh;
       for(var i = 0; i < 20; i++){
-        var tempBush = App.Utils.AnimMorphs[3].clone();
-        tempBush.position.set(App.Utils.randomNum(-100,100),10,140);
-        this.add(tempBush);
+        var bushtexture = THREE.ImageUtils.loadTexture("images/bush.png");
+        bushtexture.wrapS = THREE.RepeatWrapping;
+        bushtexture.wrapT = THREE.RepeatWrapping;
+        bushtexture.repeat.set(8,8);
+    
+        var materialScene = new THREE.MeshBasicMaterial( { 
+          shading: THREE.FlatShading,
+          // map: bushtexture,
+          color: 0x006F00,
+          opacity: 0.5
+          // wireframe: true 
+        });
+
+        materialScene.transparent = true
+        bushMesh = new THREE.Mesh( app.Utils.BushGeometry, materialScene );
+        var sc = 1;
+        bushMesh.scale.set( sc, sc, sc );
+        bushMesh.updateMatrix();
+        bushMesh.position.set(app.Utils.randomNum(-100,100),10,140);
+        this.add(bushMesh);
       }
     },
     DrawTrees: function(){
       var numTrees = app.Utils.randomNum(2,4);
-      _this = this;
       for(var i = 1; i < numTrees; i++){
-        var tempTree = App.Utils.AnimMorphs[2].clone();
-        tempTree.position.set(App.Utils.randomNum(-100,100),10,App.Utils.randomNum(0,80));
-        this.add(tempTree)
+        var materialScene = new THREE.MeshBasicMaterial( { 
+          color: 0x000000, 
+          shading: THREE.FlatShading
+        });
+        var treeMesh = new THREE.Mesh( app.Utils.TreeGeometry, materialScene );
+        var sc = app.Utils.randomNum(40,80);
+        treeMesh.scale.set( sc, sc, sc );
+        treeMesh.updateMatrix();
+
+        treeMesh.position.set(app.Utils.randomNum(-100,100),10,app.Utils.randomNum(0,80));
+        this.add(treeMesh)
       }
     },
     add: function(obj){
@@ -108,7 +130,22 @@ window.app = window.app || {};
       index = 0;
     },
     createGunModel: function(){
-      this.gun = App.Utils.AnimMorphs[1].clone();
+      var material = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+      this.gun = new THREE.MorphAnimMesh( app.Utils.GunGeometry, material );
+
+      this.gun.duration = 1000;
+
+      var s = 0.75;
+      this.gun.scale.set( s, s, s );
+      this.gun.position.set(11,30,200);
+
+      this.gun.rotation.y = -5;
+      this.gun.rotation.x = 6;
+      this.gun.rotation.z = 5;
+
+      this.gun.castShadow = true;
+      this.gun.receiveShadow = true;
+
       this.add(this.gun);      
     },
     flash: function(){

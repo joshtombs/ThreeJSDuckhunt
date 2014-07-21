@@ -10,10 +10,6 @@ window.app = window.app || {};
       birdsShot: 0,
       birdsMissed: 0
     },
-    update: function(){
-      if(this.get('birdsShot') == this.get('numberBirds'))
-        window.level++;
-    },
     start: function(){
       this.set('scene', new app.Views.Scene({
         skyColor: this.skyColor

@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/app.css">
     <script type='text/template' id='scoreboard-template'>
       <div class='scoreboard'>
-        <h3 id='playername'>Player Name</h3>
+        <h3 id='playername'><%- name %></h3>
         <p class='shotsleft'>Shots:
           <span id='shotsleft'><%-bullets %></span>
         </p>
@@ -25,20 +25,25 @@
       Level: <span id='level'><%-number %>
     </script>
     <script type='text/template' id='birdDisplay-template'>
-    <div class='duckcounter'></div>
+        <div class='duckcounter'></div>
     </script>
     <script type='text/template' id='playerInfo-template'>
-    <div class='playerinfo'>
-      <h1> DuckHunt!! </h1><br>
-      <p>Please enter your name: <input type='text' /></p>
-    </div>
+        <div class='playerinfo'>
+          <h1> DuckHunt!! </h1><br>
+          Please enter your name: <input type='text' id='namebox' />
+        </div>
     </script>
-
+    <script type='text/template' id='inbetween-template'>
+        <div class='Inbetween'>
+          <h1> Youre Inbetween Levels </h1><br>
+        </div>
+    </script>
   </head>
   <body>
     <div class="score-board"></div>
     <div class="bird-display"></div>
     <div class="player-info"></div>
+    <div class="inbetween"></div>
     <script src="bower_components/jquery/dist/jquery.js"></script>        
     <script src="bower_components/three.js/build/three.js"></script>    
     <script src="bower_components/lodash/dist/lodash.js"></script>    
@@ -64,6 +69,7 @@
     <script src='js/views/scoreboard.js'></script>
     <script src='js/views/playerinfo.js'></script>
     <script src='js/views/birdDisplay.js'></script>
+    <script src='js/views/inbetween.js'></script>
     <script src='js/models/game.js'></script>   
     <script src='app.js'></script>
   </body>

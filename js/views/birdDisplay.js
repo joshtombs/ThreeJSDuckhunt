@@ -5,7 +5,7 @@ window.app = window.app || {};
     el: '.bird-display',
     template: _.template(document.querySelector('#birdDisplay-template').innerText),
     initialize: function(){
-      this.listenTo( this.model, "change:birdsShot", this.render);
+      this.listenTo( this.model, "change", this.render);
     },
     render: function(){
       this.$el.html(this.template());

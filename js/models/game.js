@@ -15,7 +15,10 @@ window.app = window.app || {};
       this.set('projector', new THREE.Projector());
       this.set('renderer', new THREE.WebGLRenderer( { antialias: true } ));
       this.set('clock', new THREE.Clock());
-      this.set('player', new app.Models.Player());
+      this.set('player', new app.Models.Player({
+        name: App.Utils.PlayerName
+      })
+      );
 
       document.body.style.cursor = 'crosshair';
 
@@ -29,53 +32,18 @@ window.app = window.app || {};
       document.body.appendChild( this.get('renderer').domElement );
 
       _this = this;
-      this.getPlayerInfo();
-        
 
       this.set('levels', new app.Collections.Levels([
       {
-        number: 1,
+        number: 6,
         velocity:{
-          x: 0.2,
-          y: 0.2,
-          z: 0
-        },
-        maxDistance: 30,
-        numberBirds: 3,
-        skyColor: 0x6E91FF
-      },
-      {
-        number: 2,
-        velocity:{
-          x: 0.2,
-          y: 0.2,
-          z: 0
+          x: 0.5,
+          y: 0.3,
+          z: 0.4
         },
         maxDistance: 40,
-        numberBirds: 4,
-        skyColor: 0xE61A1A
-      },
-      {
-        number: 3,
-        velocity:{
-          x: 0.3,
-          y: 0.3,
-          z: 0.2
-        },
-        maxDistance: 40,
-        numberBirds: 4,
-        skyColor: 0x58A32D
-      },
-      {
-        number: 4,
-        velocity:{
-          x: 0.3,
-          y: 0.3,
-          z: 0.3
-        },
-        maxDistance: 50,
         numberBirds: 5,
-        skyColor: 0xE9E9CF
+        skyColor: 0x5EE76E
       },
       {
         number: 5,
@@ -89,19 +57,53 @@ window.app = window.app || {};
         skyColor: 0xA233CE
       },
       {
-        number: 6,
+        number: 4,
         velocity:{
-          x: 0.5,
+          x: 0.3,
           y: 0.3,
-          z: 0.4
+          z: 0.3
+        },
+        maxDistance: 50,
+        numberBirds: 5,
+        skyColor: 0xE9E9CF
+      },
+      {
+        number: 3,
+        velocity:{
+          x: 0.3,
+          y: 0.3,
+          z: 0.2
         },
         maxDistance: 40,
-        numberBirds: 5,
-        skyColor: 0x5EE76E
+        numberBirds: 4,
+        skyColor: 0x58A32D
+      },
+      {
+        number: 2,
+        velocity:{
+          x: 0.2,
+          y: 0.2,
+          z: 0
+        },
+        maxDistance: 40,
+        numberBirds: 4,
+        skyColor: 0xE61A1A
+      },
+      {
+        number: 1,
+        velocity:{
+          x: 0.2,
+          y: 0.2,
+          z: 0
+        },
+        maxDistance: 30,
+        numberBirds: 3,
+        skyColor: 0x6E91FF
       }
     ]));
     this.set('level', this.get('levels').pop());
     this.generateUI();
+    this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
 
     this.get('level').start();
     this.render();
@@ -123,6 +125,19 @@ window.app = window.app || {};
     },
     start: function(){
 
+    },
+    updateLevel: function(){
+      if(this.get('level').get('birdsShot') == this.get('level').get('numberBirds')){
+        var _this = this;
+        setTimeout(function(){_this.set('level', _this.get('levels').pop())},200);
+        var inbetweenLevels = new app.Views.Inbetween();
+        
+        // this.get('level').start();
+        // this.generateUI();
+      } else{
+        var _this = this;
+        setTimeout(function(){ _this.get('level').get('scene').createBirdModel()},500);
+      }
     },
     generateUI: function(){
       var scoreboard = new app.Views.Scoreboard({
@@ -166,65 +181,55 @@ window.app = window.app || {};
       document.body.style.cursor = 'crosshair';
       this.get('level').get('scene').flash();
       this.get('player').shoot();
-      _this = this;
+      var _this = this;
       if(this.get('player').clipEmpty()){
         setTimeout(function(){_this.get('player').reload()}, 2500);
       }
       if ( intersects.length > 0 ) {
-        this.get('level').birdsShot = this.get('level').birdsShot + 1;
-        duckIndex--;
-        // grayDuck(duckIndex);
+        this.get('level').set('birdsShot', (this.get('level').get('birdsShot') + 1));
         app.game.get('player').incrementScoreBy(1);
         app.game.get('level').get('scene').remove(intersects[0].object);
         app.game.get('level').get('scene').morphs.pop();
-        setTimeout(function(){ _this.get('level').get('scene').createBirdModel()},500);
       }
     },
     onMouseUp: function(e){
       e.preventDefault();
       document.body.style.cursor = 'crosshair';
     },
-    getPlayerInfo: function(){
-      var playerinfo = new app.Views.PlayerInfo();
-      playerinfo.render();
-      playerinfo.close();
-    },
     render: function() {
       requestAnimationFrame(this.render.bind(this));
-
       var delta = this.get('clock').getDelta();
-      var Scene = this.get('level').get('scene');
-      var gun   = Scene.gun;
-      Scene.camera.lookAt( Scene.scene.position );
-      // camera.rotateX((1 - app.Utils.vertLook) *Math.PI/2)
-      
-      if(gun != undefined){
-        gun.lookAt( Scene.scene.position );
-        gun.rotateY((((app.Utils.horzLook)*-2))* Math.PI/2);
-        gun.rotateZ((1 - app.Utils.vertLook) * (Math.PI - 2)/2);
-        gun.rotateY(0);
-      }  
-      Scene.sky.position.x += 0.5
-      if(Scene.sky.position.x > 600)
-        Scene.sky.position.x = 0;
-      // checkIndex();
-      // updateLevel();
-      Bird = this.get('level').get('scene').bird;
-      if(Bird.get('threeBird') != undefined){
-        birdPos = Bird.get('threeBird').position;
-        if((birdPos.y > 86) || birdPos.x > (app.Utils.idealWidth / 5) || birdPos.x < -(app.Utils.idealWidth/5)) {
-          this.get('level').get('scene').outOfView();
+      if(this.get('level').get('scene') != undefined){
+        var Scene = this.get('level').get('scene');
+        var gun   = Scene.gun;
+        Scene.camera.lookAt( Scene.scene.position );
+        // camera.rotateX((1 - app.Utils.vertLook) *Math.PI/2)
+        if(gun != undefined){
+          gun.lookAt( Scene.scene.position );
+          gun.rotateY((((app.Utils.horzLook)*-2))* Math.PI/2);
+          gun.rotateZ((1 - app.Utils.vertLook) * (Math.PI - 2)/2);
+          gun.rotateY(0);
+        }  
+        Scene.sky.position.x += 0.5
+        if(Scene.sky.position.x > 600)
+          Scene.sky.position.x = 0;
+        Bird = this.get('level').get('scene').bird;
+        if(Bird.get('threeBird') != undefined){
+          birdPos = Bird.get('threeBird').position;
+          if((birdPos.y > 86) || birdPos.x > (app.Utils.idealWidth / 5) || birdPos.x < -(app.Utils.idealWidth/5)) {
+            this.get('level').get('scene').outOfView();
+          }
+          else{  
+            Bird.fly();
+            Bird.updateTarget();
+          }
         }
-        else{  
-          Bird.fly();
-          Bird.updateTarget();
+        var morph;
+        var morphs = Scene.morphs;  
+        for ( var i = 0; i < morphs.length; i ++ ) {
+          morph = morphs[ i ];
+          morph.updateAnimation( 1000 * delta );
         }
-      }
-      var morph;
-      var morphs = Scene.morphs;  
-      for ( var i = 0; i < morphs.length; i ++ ) {
-        morph = morphs[ i ];
-        morph.updateAnimation( 1000 * delta );
       }
       this.get('renderer').render( Scene.scene, Scene.camera );
       // effect.render(scene, camera);
