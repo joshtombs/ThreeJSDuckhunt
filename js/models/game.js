@@ -126,12 +126,29 @@ window.app = window.app || {};
     start: function(){
 
     },
+    pause: function(){
+      cancelAnimationFrame(app.Utils.ID);
+      window.document.removeEventListener("mousemove", app.game.onMouseMove);
+      window.document.removeEventListener("mousedown", app.game.onMouseDown);
+      window.document.removeEventListener("mouseup", app.game.onMouseUp);
+    },
+    resume: function(){
+      this.render();
+      window.document.addEventListener("mousemove", this.onMouseMove.bind(this));
+      window.document.addEventListener("mousedown", this.onMouseDown.bind(this));
+      window.document.addEventListener("mouseup", this.onMouseUp.bind(this));
+    },
     updateLevel: function(){
       if(this.get('level').get('birdsShot') == this.get('level').get('numberBirds')){
         var _this = this;
-        setTimeout(function(){_this.set('level', _this.get('levels').pop())},200);
-        var inbetweenLevels = new app.Views.Inbetween();
-        
+        this.pause();
+        this.set('level', void 0);
+        // setTimeout(function(){_this.set('level', _this.get('levels').pop())},200);
+        app.inbetweenLevels = new app.Views.Inbetween({
+          model: this,
+          cb: this.resume.bind(this)
+        });
+        app.inbetweenLevels.render();
         // this.get('level').start();
         // this.generateUI();
       } else{
@@ -163,10 +180,10 @@ window.app = window.app || {};
 
       this.get('mouse').x = 2 * (e.clientX / app.Utils.idealWidth) -1;
       this.get('mouse').y = 1 - 2 * (e.clientY / app.Utils.idealHeight);
-
-      this.set('raycaster', this.get('projector').pickingRay( this.get('mouse').clone(), this.get('level').get('scene').camera ));
-      window.intersects = this.get('raycaster').intersectObject(this.get('level').get('scene').bird.get('threeBird'));
-
+      if(this.get('level') != void 0){
+        this.set('raycaster', this.get('projector').pickingRay( this.get('mouse').clone(), this.get('level').get('scene').camera ));
+        window.intersects = this.get('raycaster').intersectObject(this.get('level').get('scene').bird.get('threeBird'));
+      }
       document.body.style.cursor = 'crosshair';
     },
     onMouseDown: function(e){
@@ -186,10 +203,10 @@ window.app = window.app || {};
         setTimeout(function(){_this.get('player').reload()}, 2500);
       }
       if ( intersects.length > 0 ) {
-        this.get('level').set('birdsShot', (this.get('level').get('birdsShot') + 1));
         app.game.get('player').incrementScoreBy(1);
         app.game.get('level').get('scene').remove(intersects[0].object);
         app.game.get('level').get('scene').morphs.pop();
+        this.get('level').set('birdsShot', (this.get('level').get('birdsShot') + 1));
       }
     },
     onMouseUp: function(e){
@@ -197,7 +214,7 @@ window.app = window.app || {};
       document.body.style.cursor = 'crosshair';
     },
     render: function() {
-      requestAnimationFrame(this.render.bind(this));
+      app.Utils.ID = requestAnimationFrame(this.render.bind(this));
       var delta = this.get('clock').getDelta();
       if(this.get('level').get('scene') != undefined){
         var Scene = this.get('level').get('scene');
@@ -230,9 +247,9 @@ window.app = window.app || {};
           morph = morphs[ i ];
           morph.updateAnimation( 1000 * delta );
         }
+        this.get('renderer').render( Scene.scene, Scene.camera );
+        // effect.render(scene, camera);
       }
-      this.get('renderer').render( Scene.scene, Scene.camera );
-      // effect.render(scene, camera);
 
     },
     end: function(){
