@@ -22,7 +22,6 @@
 	"colorAmbient" : [1.0, 1.0, 1.0],
 	"colorDiffuse" : [0.737255, 0.737255, 0.737255],
 	"colorSpecular" : [0.0, 0.0, 0.0],
-	"mapDiffuse" : "roughbarktex.bmp",
 	"specularCoef" : 0.0,
 	"transparency" : 0.996078,
 	"transparent" : true
@@ -35,7 +34,6 @@
 	"colorAmbient" : [1.0, 1.0, 1.0],
 	"colorDiffuse" : [0.737255, 0.737255, 0.737255],
 	"colorSpecular" : [0.0, 0.0, 0.0],
-	"mapDiffuse" : "lindgreentreetex.tga",
 	"specularCoef" : 0.0,
 	"transparency" : 0.996078,
 	"transparent" : true
