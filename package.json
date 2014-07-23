@@ -3,7 +3,8 @@
     "gulp": "^3.8.6",
     "gulp-watch": "^0.6.8",
     "gulp-concat": "^2.3.4",
-    "gulp-include": "^0.2.3"
+    "gulp-include": "^0.2.3",
+    "gulp-template-compile": "^0.2.0"
   },
   "scripts": {
     "dev": "gulp watch"

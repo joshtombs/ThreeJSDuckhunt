@@ -3,7 +3,7 @@ window.app = window.app || {};
   App.Views = App.Views || {};
   App.Views.Scoreboard = Backbone.View.extend({
     el: '.score-board',
-    template: _.template(document.querySelector('#scoreboard-template').innerText),
+    template: JST['scoreboard'],
     initialize: function(options) {
       this.options = options;
       this.listenTo(this.model, "change", this.render);
@@ -11,7 +11,7 @@ window.app = window.app || {};
     render: function(){
       this.$el.html(this.template(this.model.attributes));
       this.levelinfo = new app.Views.LevelInfo({
-        el: this.$el.find('.level'), 
+        el: this.$el.find('.level'),
         model: this.options.levelmodel
       });
       this.levelinfo.render();

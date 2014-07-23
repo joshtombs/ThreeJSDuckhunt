@@ -5,39 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/app.css">
-    <script type='text/template' id='scoreboard-template'>
-      <div class='scoreboard'>
-        <h3 id='playername'><%- name %></h3>
-        <p class='shotsleft'>Shots:
-          <span id='shotsleft'><%-bullets %></span>
-        </p>
-        <p class='score'>Score:
-          <span id='score'><%-score %></span>
-        </p>
-        <p class='level'></p>
-        <audio id='fired' src="shot.mp3" ></audio>
-        <audio id='reload' src="reload.mp3" ></audio>
-        <audio id='empty' srec="empty.mp3"></audio>
-      </div>
-    </script>
-    <script type='text/template' id='level-template'>
-      Level: <span id='level'><%-number %>
-    </script>
-    <script type='text/template' id='birdDisplay-template'>
-        <div class='duckcounter'></div>
-    </script>
-    <script type='text/template' id='playerInfo-template'>
-        <div class='playerinfo'>
-          <h1> DuckHunt!! </h1><br>
-          Please enter your name: <input type='text' id='namebox' />
-        </div>
-    </script>
-    <script type='text/template' id='inbetween-template'>
-        <div class='Inbetween'>
-          <h1> Youre Inbetween Levels </h1><br>
-          <input type='button' class='start-level' value='Start Level'/>
-        </div>
-    </script>
   </head>
   <body>
     <div class="score-board"></div>
@@ -45,6 +12,7 @@
     <div class="player-info"></div>
     <div class="inbetween"></div>
     <script src="js/build/vendor.js"></script>
+    <script src="js/build/templates.js"></script>
     <script src="js/build/assets.js"></script>
   </body>
 </html>

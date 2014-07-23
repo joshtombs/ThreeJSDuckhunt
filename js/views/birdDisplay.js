@@ -3,7 +3,7 @@ window.app = window.app || {};
   App.Views = App.Views || {};
   App.Views.birdDisplay = Backbone.View.extend({
     el: '.bird-display',
-    template: _.template(document.querySelector('#birdDisplay-template').innerText),
+    template: JST['bird_display'],
     initialize: function(){
       this.listenTo( this.model, "change", this.render);
     },
@@ -12,10 +12,10 @@ window.app = window.app || {};
       this.$el.html(this.template());
       shot = this.model.get('birdsShot');
       for(var i = 0; i < shot; i++){
-        this.$el.children().append("<img src='images/duck.jpg' class='duckIMG' />"); 
+        this.$el.children().append("<img src='images/duck.jpg' class='duckIMG' />");
       }
       for(var j = shot; j < this.model.get('numberBirds'); j++){
-        this.$el.children().append("<img src='images/gduck.jpg' class='duckIMG' />"); 
+        this.$el.children().append("<img src='images/gduck.jpg' class='duckIMG' />");
       }
       return this.el;
     }

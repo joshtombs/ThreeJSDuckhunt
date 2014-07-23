@@ -4,7 +4,7 @@ window.app = window.app || {};
   App.Utils = App.Utils || {};
   App.Views.PlayerInfo = Backbone.View.extend({
     el: '.player-info',
-    template: _.template(document.querySelector('#playerInfo-template').innerText),
+    template: JST['player_info'],
     events: {
       "change input#namebox": "nameEntered"
     },
@@ -13,7 +13,7 @@ window.app = window.app || {};
     },
     nameEntered: function(e){
       App.Utils.PlayerName = $(e.target).val();
-      this.close()  
+      this.close()
     },
     render: function(){
       this.$el.html(this.template());

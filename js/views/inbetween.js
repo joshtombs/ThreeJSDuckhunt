@@ -3,7 +3,7 @@ window.app = window.app || {};
   app.Views = app.Views || {};
   app.Views.Inbetween = Backbone.View.extend({
     el: '.inbetween',
-    template: _.template(document.querySelector('#inbetween-template').innerText),
+    template: JST['inbetween'],
     events:{
       'click input.start-level': 'close'
     },
