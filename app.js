@@ -17,6 +17,7 @@ function init() {
     });
   });
   info.render();
+  document.getElementById('namebox').focus();
 }
 
 // function updateLevel(){
