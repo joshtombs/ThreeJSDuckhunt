@@ -3,14 +3,28 @@ window.app = window.app || {};
   App.Models = App.Models || {};
   App.Models.Game = Backbone.Model.extend({
     defaults:{
-      levels: []
+      levels: [],
+      updateUI: true
     },
+    setEventListeners: function() {
+      $(window).on("mousedown", this.onMouseDown.bind(this));
+      $(window).on("mouseup", this.onMouseUp.bind(this));
+      $(window).on("mousemove", this.onMouseMove.bind(this));
+    },
+
+    removeEventListeners: function() {
+      $(window).off("mousedown");
+      $(window).off("mouseup");
+      $(window).off("mousemove");
+    },
+
     initialize: function(){
       window.addEventListener( 'resize', this.onWindowResize, false );
-      window.document.addEventListener("mousemove", this.onMouseMove.bind(this));
-      window.document.addEventListener("mousedown", this.onMouseDown.bind(this));
-      window.document.addEventListener("mouseup", this.onMouseUp.bind(this));
-      
+
+      this.on("change:level", function() {
+        this.generateUI()
+      });
+
       this.set('mouse', new THREE.Vector3());
       this.set('projector', new THREE.Projector());
       this.set('renderer', new THREE.WebGLRenderer( { antialias: true } ));
@@ -104,7 +118,7 @@ window.app = window.app || {};
     this.set('level', this.get('levels').pop());
     this.generateUI();
     this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
-
+    // this.listenTo( this.get('updateUI'), "change", this.generateUI);
     this.get('level').start();
     this.render();
 
@@ -124,25 +138,23 @@ window.app = window.app || {};
     this.get('effect').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
     },
     start: function(){
-
+      console.log("wow");
+      this.setEventListeners();      
     },
     pause: function(){
       cancelAnimationFrame(app.Utils.ID);
-      window.document.removeEventListener("mousemove", app.game.onMouseMove);
-      window.document.removeEventListener("mousedown", app.game.onMouseDown);
-      window.document.removeEventListener("mouseup", app.game.onMouseUp);
+      console.log('pause')
+      this.removeEventListeners();      
     },
     resume: function(){
       this.render();
-      window.document.addEventListener("mousemove", this.onMouseMove.bind(this));
-      window.document.addEventListener("mousedown", this.onMouseDown.bind(this));
-      window.document.addEventListener("mouseup", this.onMouseUp.bind(this));
+      this.removeEventListeners();      
+      this.setEventListeners();
     },
     updateLevel: function(){
       if(this.get('level').get('birdsShot') == this.get('level').get('numberBirds')){
         var _this = this;
         this.pause();
-        this.set('level', void 0);
         // setTimeout(function(){_this.set('level', _this.get('levels').pop())},200);
         app.inbetweenLevels = new app.Views.Inbetween({
           model: this,
@@ -157,6 +169,7 @@ window.app = window.app || {};
       }
     },
     generateUI: function(){
+      console.log('generate Ui')
       var scoreboard = new app.Views.Scoreboard({
         model: this.get('player'),
         levelmodel: this.get('level')
@@ -187,6 +200,7 @@ window.app = window.app || {};
       document.body.style.cursor = 'crosshair';
     },
     onMouseDown: function(e){
+      console.log("wow");
       e.preventDefault();
       var audio;
       if(this.get('player').clipEmpty()){

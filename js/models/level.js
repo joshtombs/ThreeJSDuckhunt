@@ -10,10 +10,19 @@ window.app = window.app || {};
       birdsShot: 0,
       birdsMissed: 0
     },
+    initialize: function(){
+      this.listenTo(this, 'change:birdsMissed', this.endGame);
+    },
     start: function(){
       this.set('scene', new app.Views.Scene({
-        skyColor: this.skyColor
+        skyColor: this.skyColor,
+        level: this
       }));
+    },
+    endGame: function(){
+      if(this.get('birdsMissed') >= Math.floor(0.8*this.get('numberBirds'))){
+        console.log('end game')
+      }
     }
   })
 })(window.app, Backbone)

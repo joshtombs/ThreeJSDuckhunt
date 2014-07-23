@@ -13,6 +13,7 @@ function init() {
       app.game = new app.Models.Game({
 
       });
+      app.game.start();
     });
   });
   info.render();

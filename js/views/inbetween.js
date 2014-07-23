@@ -5,7 +5,7 @@ window.app = window.app || {};
     el: '.inbetween',
     template: _.template(document.querySelector('#inbetween-template').innerText),
     events:{
-      'click input.next-level': 'close'
+      'click input.start-level': 'close'
     },
     render: function(){
       this.$el.html(this.template(this.model.attributes));

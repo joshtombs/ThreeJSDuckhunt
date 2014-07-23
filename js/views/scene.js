@@ -3,6 +3,8 @@ window.app = window.app || {};
   App.Views = App.Views || {};
   App.Views.Scene = Backbone.View.extend({
     initialize: function(options){
+      this.level = options.level;
+      console.log(this.level);
       this.scene = new THREE.Scene();
       this.camera = new THREE.PerspectiveCamera( 60, app.Utils.idealWidth / app.Utils.idealHeight, 1, 1000 );
       this.camera.position.set( 0, 50, 205 );
@@ -159,8 +161,9 @@ window.app = window.app || {};
     outOfView: function(){
       this.remove(this.bird.get('threeBird'));
       this.morphs.pop();
+      this.level.set('birdsMissed', this.level.get('birdsMissed') + 1)
+      console.log(this.level.get('birdsMissed'))
       this.createBirdModel();
-      this.duckIndex--;
     }
 
   });
