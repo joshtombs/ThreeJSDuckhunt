@@ -2,7 +2,7 @@ window.app = window.app || {};
 ;(function(App, Backbone){
   app.Views = app.Views || {};
   app.Views.Endgame = Backbone.View.extend({
-    el: 'game-ender',
+    el: '.game-ender',
     template: JST['end_game'],
     // events:{
     //   'click input.end-game': 'close'

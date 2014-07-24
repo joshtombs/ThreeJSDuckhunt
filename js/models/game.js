@@ -255,6 +255,8 @@ window.app = window.app || {};
 
     },
     end: function(){
+      this.pause();
+      $('.canvas').css('display', 'none');
       var ender = new app.Views.Endgame();
       ender.render();
     }
