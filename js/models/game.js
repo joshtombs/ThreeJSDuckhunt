@@ -138,12 +138,10 @@ window.app = window.app || {};
     this.get('effect').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
     },
     start: function(){
-      console.log("wow");
       this.setEventListeners();      
     },
     pause: function(){
       cancelAnimationFrame(app.Utils.ID);
-      console.log('pause')
       this.removeEventListeners();      
     },
     resume: function(){
@@ -169,7 +167,6 @@ window.app = window.app || {};
       }
     },
     generateUI: function(){
-      console.log('generate Ui')
       var scoreboard = new app.Views.Scoreboard({
         model: this.get('player'),
         levelmodel: this.get('level')
@@ -200,7 +197,6 @@ window.app = window.app || {};
       document.body.style.cursor = 'crosshair';
     },
     onMouseDown: function(e){
-      console.log("wow");
       e.preventDefault();
       var audio;
       if(this.get('player').clipEmpty()){

@@ -8,7 +8,6 @@ window.app = window.app || {};
       this.listenTo( this.model, "change", this.render);
     },
     render: function(){
-      console.log('remaking bird display')
       this.$el.html(this.template());
       shot = this.model.get('birdsShot');
       for(var i = 0; i < shot; i++){

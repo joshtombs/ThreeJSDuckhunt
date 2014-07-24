@@ -21,7 +21,6 @@ window.app = window.app || {};
     },
     endGame: function(){
       if(this.get('birdsMissed') >= Math.floor(0.8*this.get('numberBirds'))){
-        console.log('end game')
       }
     }
   })
