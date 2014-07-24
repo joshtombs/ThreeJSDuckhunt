@@ -21,7 +21,6 @@ function init() {
           model: score
         });
         a.render()
-        // console.log(score.attributes)
       })
     },
     error: function(error){

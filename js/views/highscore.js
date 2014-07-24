@@ -6,7 +6,6 @@ window.app = window.app || {};
     el: '.highscores',
     template: JST['highscore'],
     render: function(){
-      console.log(this.model)
       this.$el.append(this.template(this.model.attributes));
       return this.el;
     }

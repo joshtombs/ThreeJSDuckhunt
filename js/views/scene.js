@@ -79,13 +79,9 @@ window.app = window.app || {};
           shading: THREE.FlatShading,
           map: bushtexture,
           color: 0x004F00
-          // opacity: 0.5
-          // wireframe: true 
         });
 
-        // materialScene.transparent = true
         bushMesh = new THREE.Mesh( app.Utils.BushGeometry, materialScene );
-        // bushMesh = new THREE.Mesh(new THREE.BoxGeometry(10,10,10), materialScene)
         var sc = 1;
         bushMesh.scale.set( sc, sc, sc );
         bushMesh.updateMatrix();
@@ -159,7 +155,6 @@ window.app = window.app || {};
       },70);
     },
     outOfView: function(){
-      console.log('bird missed')
       this.remove(this.bird.get('threeBird'));
       this.morphs.pop();
       this.level.set('birdsMissed', this.level.get('birdsMissed') + 1)
