@@ -2,8 +2,10 @@ window.app = window.app || {};
 ;(function(App, Backbone, jQuery){
   App.Views = App.Views || {};
   App.Views.Scoreboard = Backbone.View.extend({
-    el: '.score-board',
     template: JST['scoreboard'],
+    events:{
+      'click input.pause-button': 'pause'
+    },
     initialize: function(options) {
       this.options = options;
       this.listenTo(this.model, "change", this.render);
@@ -15,7 +17,11 @@ window.app = window.app || {};
         model: this.options.levelmodel
       });
       this.levelinfo.render();
-      return this.el;
+
+      return this;
+    },
+    pause: function() {
+      console.log("hit");
     }
   });
 })(app, Backbone, jQuery)

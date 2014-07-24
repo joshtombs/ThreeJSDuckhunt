@@ -116,7 +116,6 @@ window.app = window.app || {};
       }
     ]));
     this.set('level', this.get('levels').pop());
-    this.generateUI();
     this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
     // this.listenTo( this.get('updateUI'), "change", this.generateUI);
     this.get('level').start();
@@ -171,7 +170,7 @@ window.app = window.app || {};
         model: this.get('player'),
         levelmodel: this.get('level')
       });
-      scoreboard.render();
+      $('.score-board').html(scoreboard.render().el)
       var birdDisplay = new app.Views.birdDisplay({
         model: this.get('level')
       });
