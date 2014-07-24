@@ -69,26 +69,27 @@ window.app = window.app || {};
     },
     DrawBushes: function(){
       var bushMesh;
-      for(var i = 0; i < 20; i++){
-        var bushtexture = THREE.ImageUtils.loadTexture("images/bush.png");
+      for(var i = 0; i < 30; i++){
+        var bushtexture = THREE.ImageUtils.loadTexture("images/bush.jpg");
         bushtexture.wrapS = THREE.RepeatWrapping;
         bushtexture.wrapT = THREE.RepeatWrapping;
         bushtexture.repeat.set(8,8);
     
-        var materialScene = new THREE.MeshBasicMaterial( { 
+        var materialScene = new THREE.MeshLambertMaterial( { 
           shading: THREE.FlatShading,
-          // map: bushtexture,
-          color: 0x006F00,
-          opacity: 0.5
+          map: bushtexture,
+          color: 0x004F00
+          // opacity: 0.5
           // wireframe: true 
         });
 
-        materialScene.transparent = true
+        // materialScene.transparent = true
         bushMesh = new THREE.Mesh( app.Utils.BushGeometry, materialScene );
+        // bushMesh = new THREE.Mesh(new THREE.BoxGeometry(10,10,10), materialScene)
         var sc = 1;
         bushMesh.scale.set( sc, sc, sc );
         bushMesh.updateMatrix();
-        bushMesh.position.set(app.Utils.randomNum(-100,100),10,140);
+        bushMesh.position.set(-100 + 10*i,10,140);
         this.add(bushMesh);
       }
     },
