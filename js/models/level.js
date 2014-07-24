@@ -15,7 +15,7 @@ window.app = window.app || {};
     },
     start: function(){
       this.set('scene', new app.Views.Scene({
-        skyColor: this.skyColor,
+        skyColor: this.get('skyColor'),
         level: this
       }));
     },
