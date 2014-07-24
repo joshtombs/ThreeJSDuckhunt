@@ -29,12 +29,11 @@ window.app = window.app || {};
       this.set('projector', new THREE.Projector());
       this.set('renderer', new THREE.WebGLRenderer( { antialias: true } ));
       this.set('clock', new THREE.Clock());
-      this.set('player', new app.Models.Player({
-        name: App.Utils.PlayerName
-      })
+      this.set('player', 
+        new app.Models.Player({
+          name: App.Utils.PlayerName
+        })
       );
-
-      // document.body.style.cursor = 'crosshair';
 
       this.get('renderer').sortObjects = false;
       this.get('renderer').setClearColor( 0x7ec0ee );
@@ -117,7 +116,6 @@ window.app = window.app || {};
     ]));
     this.set('level', this.get('levels').pop());
     this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
-    // this.listenTo( this.get('updateUI'), "change", this.generateUI);
     this.get('level').start();
     this.render();
 
@@ -149,17 +147,14 @@ window.app = window.app || {};
       this.setEventListeners();
     },
     updateLevel: function(){
-      if(this.get('level').get('birdsShot') == this.get('level').get('numberBirds')){
+      if(this.get('level').get('birdsShot') >= this.get('level').get('numberBirds')){
         var _this = this;
         this.pause();
-        // setTimeout(function(){_this.set('level', _this.get('levels').pop())},200);
         app.inbetweenLevels = new app.Views.Inbetween({
           model: this,
           cb: this.resume.bind(this)
         });
         app.inbetweenLevels.render();
-        // this.get('level').start();
-        // this.generateUI();
       } else{
         var _this = this;
         setTimeout(function(){ _this.get('level').get('scene').createBirdModel()},500);
@@ -193,7 +188,6 @@ window.app = window.app || {};
         this.set('raycaster', this.get('projector').pickingRay( this.get('mouse').clone(), this.get('level').get('scene').camera ));
         window.intersects = this.get('raycaster').intersectObject(this.get('level').get('scene').bird.get('threeBird'));
       }
-      // document.body.style.cursor = 'crosshair';
     },
     onMouseDown: function(e){
       e.preventDefault();
@@ -204,7 +198,6 @@ window.app = window.app || {};
         audio.play();
         return
       }
-      // document.body.style.cursor = 'crosshair';
       this.get('level').get('scene').flash();
       this.get('player').shoot();
       var _this = this;
@@ -212,15 +205,15 @@ window.app = window.app || {};
         setTimeout(function(){_this.get('player').reload()}, 2500);
       }
       if ( intersects.length > 0 ) {
+        var level = app.game.get('level')
         app.game.get('player').incrementScoreBy(1);
-        app.game.get('level').get('scene').remove(intersects[0].object);
-        app.game.get('level').get('scene').morphs.pop();
-        this.get('level').set('birdsShot', (this.get('level').get('birdsShot') + 1));
+        level.get('scene').remove(intersects[0].object);
+        level.get('scene').morphs.pop();
+        level.set('birdsShot', level.get('birdsShot') + 1);
       }
     },
     onMouseUp: function(e){
       e.preventDefault();
-      // document.body.style.cursor = 'crosshair';
     },
     render: function() {
       app.Utils.ID = requestAnimationFrame(this.render.bind(this));
@@ -262,7 +255,8 @@ window.app = window.app || {};
 
     },
     end: function(){
-
+      var ender = new app.Views.Endgame();
+      ender.render();
     }
   });
 })(app, Backbone, THREE)

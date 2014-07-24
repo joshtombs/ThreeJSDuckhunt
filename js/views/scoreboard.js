@@ -9,6 +9,7 @@ window.app = window.app || {};
     initialize: function(options) {
       this.options = options;
       this.listenTo(this.model, "change", this.render);
+      this.paused = false;
     },
     render: function(){
       this.$el.html(this.template(this.model.attributes));
@@ -21,7 +22,14 @@ window.app = window.app || {};
       return this;
     },
     pause: function() {
-      console.log("hit");
+      if(!this.paused){
+        app.game.pause();
+        this.paused = true
+      }
+      else{
+        app.game.resume();
+        this.paused = false
+      }
     }
   });
 })(app, Backbone, jQuery)
