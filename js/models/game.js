@@ -7,19 +7,19 @@ window.app = window.app || {};
       updateUI: true
     },
     setEventListeners: function() {
-      $(window).on("mousedown", this.onMouseDown.bind(this));
-      $(window).on("mouseup", this.onMouseUp.bind(this));
-      $(window).on("mousemove", this.onMouseMove.bind(this));
+      document.getElementsByClassName('canvas')[0].addEventListener("mousedown", this.onMouseDown.bind(this), false);
+      document.getElementsByClassName('canvas')[0].addEventListener("mouseup", this.onMouseUp.bind(this), false);
+      document.getElementsByClassName('canvas')[0].addEventListener("mousemove", this.onMouseMove.bind(this), false);
     },
 
     removeEventListeners: function() {
-      $(window).off("mousedown");
-      $(window).off("mouseup");
-      $(window).off("mousemove");
+      document.getElementsByClassName('canvas')[0].removeEventListener("mousedown", this.onMouseMove.bind(this), false);
+      document.getElementsByClassName('canvas')[0].removeEventListener("mouseup", this.onMouseMove.bind(this), false);
+      document.getElementsByClassName('canvas')[0].removeEventListener("mousemove", this.onMouseMove.bind(this), false);
     },
 
     initialize: function(){
-      window.addEventListener( 'resize', this.onWindowResize, false );
+      // window.addEventListener( 'resize', this.onWindowResize, false );
 
       this.on("change:level", function() {
         this.generateUI()
@@ -34,7 +34,7 @@ window.app = window.app || {};
       })
       );
 
-      document.body.style.cursor = 'crosshair';
+      // document.body.style.cursor = 'crosshair';
 
       this.get('renderer').sortObjects = false;
       this.get('renderer').setClearColor( 0x7ec0ee );
@@ -43,7 +43,7 @@ window.app = window.app || {};
       this.get('renderer').shadowMapEnabled = true;
       this.get('renderer').shadowMapCullFace = THREE.CullFaceBack;
       this.get('renderer').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
-      document.body.appendChild( this.get('renderer').domElement );
+      $('.canvas')[0].appendChild( this.get('renderer').domElement );
 
       _this = this;
 
@@ -177,13 +177,13 @@ window.app = window.app || {};
       });
       birdDisplay.render();      
     },
-    onWindowResize: function() {
-      this.get('level').get('scene').camera.aspect = app.Utils.idealWidth / app.Utils.idealHeight;
-      this.get('level').get('scene').camera.updateProjectionMatrix();
+    // onWindowResize: function() {
+    //   this.get('level').get('scene').camera.aspect = app.Utils.idealWidth / app.Utils.idealHeight;
+    //   this.get('level').get('scene').camera.updateProjectionMatrix();
 
-      this.get('renderer').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
-      // effect.setSize( window.innerWidth, window.innerHeight );
-    },
+    //   this.get('renderer').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
+    //   // effect.setSize( window.innerWidth, window.innerHeight );
+    // },
     onMouseMove: function(e){
       app.Utils.vertLook = e.y/app.Utils.idealHeight;
       app.Utils.horzLook = e.x/app.Utils.idealWidth;
@@ -194,7 +194,7 @@ window.app = window.app || {};
         this.set('raycaster', this.get('projector').pickingRay( this.get('mouse').clone(), this.get('level').get('scene').camera ));
         window.intersects = this.get('raycaster').intersectObject(this.get('level').get('scene').bird.get('threeBird'));
       }
-      document.body.style.cursor = 'crosshair';
+      // document.body.style.cursor = 'crosshair';
     },
     onMouseDown: function(e){
       e.preventDefault();
@@ -205,7 +205,7 @@ window.app = window.app || {};
         audio.play();
         return
       }
-      document.body.style.cursor = 'crosshair';
+      // document.body.style.cursor = 'crosshair';
       this.get('level').get('scene').flash();
       this.get('player').shoot();
       var _this = this;
@@ -221,7 +221,7 @@ window.app = window.app || {};
     },
     onMouseUp: function(e){
       e.preventDefault();
-      document.body.style.cursor = 'crosshair';
+      // document.body.style.cursor = 'crosshair';
     },
     render: function() {
       app.Utils.ID = requestAnimationFrame(this.render.bind(this));
