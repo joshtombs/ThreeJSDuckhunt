@@ -19,8 +19,6 @@ window.app = window.app || {};
     },
 
     initialize: function(){
-      // window.addEventListener( 'resize', this.onWindowResize, false );
-
       this.on("change:level", function() {
         this.generateUI()
       });
@@ -171,13 +169,6 @@ window.app = window.app || {};
       });
       birdDisplay.render();      
     },
-    // onWindowResize: function() {
-    //   this.get('level').get('scene').camera.aspect = app.Utils.idealWidth / app.Utils.idealHeight;
-    //   this.get('level').get('scene').camera.updateProjectionMatrix();
-
-    //   this.get('renderer').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
-    //   // effect.setSize( window.innerWidth, window.innerHeight );
-    // },
     onMouseMove: function(e){
       app.Utils.vertLook = e.y/app.Utils.idealHeight;
       app.Utils.horzLook = e.x/app.Utils.idealWidth;
@@ -259,14 +250,18 @@ window.app = window.app || {};
       $('.canvas').css('display', 'none');
       var ender = new app.Views.Endgame();
       ender.render();
-      var highscore = new app.Utils.HighScore();
       var p = app.game.get('player');
-      highscore.save({
-        name: p.get('name'),
-        score: p.get('score')
-      }).then(function(object){
-        console.log('You\'re high score of ' + app.game.get('player').get('score') + ' was saved!')
-      })
+      if(p.get('name') != 'test'){
+        if(p.get('score') > 3 && p.get('score') < 50){
+          var highscore = new app.Utils.HighScore();
+          highscore.save({
+            name: p.get('name'),
+            score: p.get('score')
+          }).then(function(object){
+            console.log('You\'re high score of ' + app.game.get('player').get('score') + ' was saved!')
+          })
+        }
+      }
     }
   });
 })(app, Backbone, THREE)

@@ -22,13 +22,3 @@ function init() {
   info.render();
   document.getElementById('namebox').focus();
 }
-
-// function updateLevel(){
-//   if(level.get('birdsShot') == levelstats[level][4]){
-//     level++;
-//     level.get('birdsShot') = 0;
-//     scene = new app.View.Scene();
-//     generateGun();
-//     generateDuckCounter();
-//   }
-// }
