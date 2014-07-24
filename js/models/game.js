@@ -46,6 +46,28 @@ window.app = window.app || {};
 
       this.set('levels', new app.Collections.Levels([
       {
+        number: 8,
+        velocity:{
+          x: 0.5,
+          y: 0.4,
+          z: 0.4
+        },
+        maxDistance: 50,
+        numberBirds: 7,
+        skyColor: 0x2A8FF0
+      },
+      {
+        number: 7,
+        velocity:{
+          x: 0.5,
+          y: 0.4,
+          z: 0.4
+        },
+        maxDistance: 50,
+        numberBirds: 6,
+        skyColor: 0x69E2BE
+      },
+      {
         number: 6,
         velocity:{
           x: 0.5,
@@ -108,7 +130,7 @@ window.app = window.app || {};
           z: 0
         },
         maxDistance: 30,
-        numberBirds: 1,
+        numberBirds: 3,
         skyColor: 0x6E91FF
       }
     ]));
@@ -152,11 +174,16 @@ window.app = window.app || {};
         var inbetweenLevels = new app.Views.Inbetween({
           model: this,
           cb: function(){
+            if(this.get('levels').length < 1){
+              alert('You\'re a weinner!')
+              app.game.end();
+            }else{
             this.set('level', this.get('levels').pop());
             this.get('level').start();
             this.get('player').reload();
             this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
             this.resume();
+          }
           }.bind(_this)
         });
         $('.inbetween').html(inbetweenLevels.render().el);
