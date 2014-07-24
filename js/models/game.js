@@ -154,6 +154,7 @@ window.app = window.app || {};
           cb: function(){
             this.set('level', this.get('levels').pop());
             this.get('level').start();
+            this.get('player').reload();
             this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
             this.resume();
           }.bind(_this)
