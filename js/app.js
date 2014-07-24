@@ -15,6 +15,7 @@ function init() {
   query.limit(5);
   query.find({
     success: function(results){
+      $('.highscores').html('')
       results.forEach(function(score){
         var a = new app.Views.highScore({
           model: score
