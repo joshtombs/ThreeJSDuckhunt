@@ -248,19 +248,18 @@ window.app = window.app || {};
     end: function(){
       this.pause();
       $('.canvas').css('display', 'none');
+      $('.highscores').css('display', '');
       var ender = new app.Views.Endgame();
       ender.render();
       var p = app.game.get('player');
       if(p.get('name') != 'test'){
-        if(p.get('score') > 3 && p.get('score') < 50){
-          var highscore = new app.Utils.HighScore();
-          highscore.save({
-            name: p.get('name'),
-            score: p.get('score')
-          }).then(function(object){
-            console.log('You\'re high score of ' + app.game.get('player').get('score') + ' was saved!')
-          })
-        }
+        var highscore = new app.Utils.HighScore();
+        highscore.save({
+          name: p.get('name'),
+          score: p.get('score')
+        }).then(function(object){
+          console.log('You\'re high score of ' + app.game.get('player').get('score') + ' was saved!')
+        })
       }
     }
   });
