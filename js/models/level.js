@@ -23,6 +23,11 @@ window.app = window.app || {};
       if(this.get('birdsMissed') >= Math.floor(0.8*this.get('numberBirds'))){
         app.game.end();
       }
+    },
+    birdShot: function(object){
+      this.get('scene').remove(object);
+      this.get('scene').morphs.pop();
+      this.set('birdsShot', this.get('birdsShot') + 1);
     }
   })
 })(window.app, Backbone)

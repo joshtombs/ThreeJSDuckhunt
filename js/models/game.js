@@ -7,15 +7,15 @@ window.app = window.app || {};
       updateUI: true
     },
     setEventListeners: function() {
-      document.getElementsByClassName('canvas')[0].addEventListener("mousedown", this.onMouseDown.bind(this), false);
-      document.getElementsByClassName('canvas')[0].addEventListener("mouseup", this.onMouseUp.bind(this), false);
-      document.getElementsByClassName('canvas')[0].addEventListener("mousemove", this.onMouseMove.bind(this), false);
+      document.getElementById('canvas').onmousedown = this.onMouseDown.bind(this);
+      document.getElementById('canvas').onmouseup = this.onMouseUp.bind(this);
+      document.getElementById('canvas').onmousemove = this.onMouseMove.bind(this);
     },
 
     removeEventListeners: function() {
-      document.getElementsByClassName('canvas')[0].removeEventListener("mousedown", this.onMouseMove.bind(this), false);
-      document.getElementsByClassName('canvas')[0].removeEventListener("mouseup", this.onMouseMove.bind(this), false);
-      document.getElementsByClassName('canvas')[0].removeEventListener("mousemove", this.onMouseMove.bind(this), false);
+      document.getElementById('canvas').onmousedown = null;
+      document.getElementById('canvas').onmouseup = null;
+      document.getElementById('canvas').onmousemove = null;
     },
 
     initialize: function(){
@@ -40,7 +40,7 @@ window.app = window.app || {};
       this.get('renderer').shadowMapEnabled = true;
       this.get('renderer').shadowMapCullFace = THREE.CullFaceBack;
       this.get('renderer').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
-      $('.canvas')[0].appendChild( this.get('renderer').domElement );
+      document.getElementById('canvas').appendChild( this.get('renderer').domElement );
 
       _this = this;
 
@@ -108,7 +108,7 @@ window.app = window.app || {};
           z: 0
         },
         maxDistance: 30,
-        numberBirds: 3,
+        numberBirds: 1,
         skyColor: 0x6E91FF
       }
     ]));
@@ -148,14 +148,19 @@ window.app = window.app || {};
       if(this.get('level').get('birdsShot') >= this.get('level').get('numberBirds')){
         var _this = this;
         this.pause();
-        app.inbetweenLevels = new app.Views.Inbetween({
+        this.stopListening(this.get('level'));
+        var inbetweenLevels = new app.Views.Inbetween({
           model: this,
-          cb: this.resume.bind(this)
+          cb: function(){
+            this.set('level', this.get('levels').pop());
+            this.get('level').start();
+            this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
+            this.resume();
+          }.bind(_this)
         });
-        app.inbetweenLevels.render();
+        $('.inbetween').html(inbetweenLevels.render().el);
       } else{
-        var _this = this;
-        setTimeout(function(){ _this.get('level').get('scene').createBirdModel()},500);
+        setTimeout(function(){ app.game.get('level').get('scene').createBirdModel()},500);
       }
     },
     generateUI: function(){
@@ -195,12 +200,10 @@ window.app = window.app || {};
       if(this.get('player').clipEmpty()){
         setTimeout(function(){_this.get('player').reload()}, 2500);
       }
-      if ( intersects.length > 0 ) {
+      if ( intersects.length > 0 ){
         var level = app.game.get('level')
         app.game.get('player').incrementScoreBy(1);
-        level.get('scene').remove(intersects[0].object);
-        level.get('scene').morphs.pop();
-        level.set('birdsShot', level.get('birdsShot') + 1);
+        level.birdShot(intersects[0].object);
       }
     },
     onMouseUp: function(e){
@@ -247,7 +250,7 @@ window.app = window.app || {};
     },
     end: function(){
       this.pause();
-      $('.canvas').css('display', 'none');
+      $('#canvas').css('display', 'none');
       $('.highscores').css('display', '');
       var ender = new app.Views.Endgame();
       ender.render();

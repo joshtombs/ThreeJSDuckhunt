@@ -11,14 +11,16 @@ function init() {
   Parse.initialize("eD4Z64yLtYzP7l5da4wj4e1cO9DPFBl8pIMtH5vv", "vU5u314ShnEjpoAJao0TI7RP9RLkN4H7fJ71EvyU");
   app.Utils.HighScore = Parse.Object.extend("HighScore");
   var query = new Parse.Query(app.Utils.HighScore);
-  // query.limit(100);
+  query.descending("score");
+  query.limit(5);
   query.find({
-    success: function(){
-      query.each(function(score){
+    success: function(results){
+      results.forEach(function(score){
         var a = new app.Views.highScore({
           model: score
         });
         a.render()
+        // console.log(score.attributes)
       })
     },
     error: function(error){

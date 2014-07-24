@@ -118,9 +118,9 @@ window.app = window.app || {};
     createBirdModel: function(){
       this.bird = new app.Models.Bird({
         position: {
-          x: app.Utils.randomNum((-app.Utils.idealWidth/20),(app.Utils.idealWidth/20)),
+          x: app.Utils.randomNum((-app.Utils.idealWidth/20), (app.Utils.idealWidth/20)),
           y: 25,
-          z: app.Utils.randomNum(50,110)
+          z: app.Utils.randomNum(50, 110)
         },
         scene: this.scene
       });
@@ -159,6 +159,7 @@ window.app = window.app || {};
       },70);
     },
     outOfView: function(){
+      console.log('bird missed')
       this.remove(this.bird.get('threeBird'));
       this.morphs.pop();
       this.level.set('birdsMissed', this.level.get('birdsMissed') + 1)
