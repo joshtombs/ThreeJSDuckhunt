@@ -259,6 +259,14 @@ window.app = window.app || {};
       $('.canvas').css('display', 'none');
       var ender = new app.Views.Endgame();
       ender.render();
+      var highscore = new app.Utils.HighScore();
+      var p = app.game.get('player');
+      highscore.save({
+        name: p.get('name'),
+        score: p.get('score')
+      }).then(function(object){
+        console.log('You\'re high score of ' + app.game.get('player').get('score') + ' was saved!')
+      })
     }
   });
 })(app, Backbone, THREE)
