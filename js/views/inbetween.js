@@ -4,7 +4,7 @@ window.app = window.app || {};
   app.Views.Inbetween = Backbone.View.extend({
     template: JST['inbetween'],
     events:{
-      'click input.start-level': 'close'
+      'click input.s-button': 'close'
     },
     initialize: function(options){
       this.callback = options.cb;

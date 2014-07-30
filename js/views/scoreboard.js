@@ -4,7 +4,7 @@ window.app = window.app || {};
   App.Views.Scoreboard = Backbone.View.extend({
     template: JST['scoreboard'],
     events:{
-      'click input.pause-button': 'pause'
+      'click input.p-button': 'pause'
     },
     initialize: function(options) {
       this.options = options;
