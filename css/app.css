@@ -182,7 +182,7 @@ body {
   position:relative;
   top:1px;
 }
-.m-button {
+/*.m-button {
   -moz-box-shadow:inset 0px 1px 0px 0px #fcf8f2;
   -webkit-box-shadow:inset 0px 1px 0px 0px #fcf8f2;
   box-shadow:inset 0px 1px 0px 0px #fcf8f2;
@@ -216,8 +216,6 @@ body {
   text-decoration:none;
   text-align:center;
   text-shadow:1px 1px 0px #cc9f52;
-  /*margin-left: 15px;
-  margin-right: 55px;*/
 }
 .m-button:hover {
   background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #eac380), color-stop(1, #f0d7ad) );
@@ -227,4 +225,8 @@ body {
 }.m-button:active {
   position:relative;
   top:1px;
+}
+*/
+.m-button{
+  width: 50px;
 }

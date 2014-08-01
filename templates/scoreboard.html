@@ -8,5 +8,6 @@
   </p>
   <p class='level'></p>
   <input type='button' class='p-button' value='Pause' />
-  <input type='button' class='m-button' value='Mute' />
+  <!-- <input type='button' class='m-button' value='Mute' /> -->
+  <% if(!this.muted){%><img src='../images/sound.jpeg' class='m-button'/><%}else{%><img src='../images/muted.jpeg'  class='m-button'/><%}%>
 </div>

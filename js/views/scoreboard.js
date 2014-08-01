@@ -5,15 +5,19 @@ window.app = window.app || {};
     template: JST['scoreboard'],
     events:{
       'click input.p-button': 'pause',
-      'click input.m-button': 'mute'
+      'click img.m-button': 'mute'
     },
     initialize: function(options) {
       this.options = options;
       this.listenTo(this.model, "change", this.render);
+      setTimeout(function(){this.listenTo(App.game, "change:muted", this.render)}.bind(this),500);
       this.paused = false;
+      this.muted = false;
     },
     render: function(){
-      this.$el.html(this.template(this.model.attributes));
+      if(app.game != undefined)
+        this.muted = app.game.get('muted')
+      this.$el.html(this.template(this.model.attributes, this.muted));
       this.levelinfo = new app.Views.LevelInfo({
         el: this.$el.find('.level'),
         model: this.options.levelmodel
@@ -33,10 +37,11 @@ window.app = window.app || {};
       }
     },
     mute: function() {
-      if(app.game.get('muted'))
-        app.game.set('muted', false)
-      else
+      if(app.game.get('muted')){
+        app.game.set('muted', false);
+      }else{
         app.game.set('muted', true)
+      }
     }
   });
 })(app, Backbone, jQuery)

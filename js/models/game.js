@@ -210,7 +210,8 @@ window.app = window.app || {};
     generateUI: function(){
       var scoreboard = new app.Views.Scoreboard({
         model: this.get('player'),
-        levelmodel: this.get('level')
+        levelmodel: this.get('level'),
+        game: this
       });
       $('.score-board').html(scoreboard.render().el)
       var birdDisplay = new app.Views.birdDisplay({
