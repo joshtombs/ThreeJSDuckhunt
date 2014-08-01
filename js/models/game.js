@@ -27,7 +27,7 @@ window.app = window.app || {};
       this.set('projector', new THREE.Projector());
       this.set('renderer', new THREE.WebGLRenderer( { antialias: true } ));
       this.set('clock', new THREE.Clock());
-      this.set('player', 
+      this.set('player',
         new app.Models.Player({
           name: App.Utils.PlayerName
         })
@@ -155,15 +155,15 @@ window.app = window.app || {};
     this.get('effect').setSize( app.Utils.idealWidth, app.Utils.idealHeight );
     },
     start: function(){
-      this.setEventListeners();      
+      this.setEventListeners();
     },
     pause: function(){
       cancelAnimationFrame(app.Utils.ID);
-      this.removeEventListeners();      
+      this.removeEventListeners();
     },
     resume: function(){
       this.render();
-      this.removeEventListeners();      
+      this.removeEventListeners();
       this.setEventListeners();
     },
     updateLevel: function(){
@@ -215,7 +215,7 @@ window.app = window.app || {};
       var birdDisplay = new app.Views.birdDisplay({
         model: this.get('level')
       });
-      birdDisplay.render();      
+      birdDisplay.render();
     },
     onMouseMove: function(e){
       app.Utils.vertLook = e.y/app.Utils.idealHeight;
@@ -265,7 +265,7 @@ window.app = window.app || {};
           gun.rotateY((((app.Utils.horzLook)*-2))* Math.PI/2);
           gun.rotateZ((1 - app.Utils.vertLook) * (Math.PI - 2)/2);
           gun.rotateY(0);
-        }  
+        }
         Scene.sky.position.x += 0.5
         if(Scene.sky.position.x > 600)
           Scene.sky.position.x = 0;
@@ -275,13 +275,13 @@ window.app = window.app || {};
           if((birdPos.y > 86) || birdPos.x > (app.Utils.idealWidth / 5) || birdPos.x < -(app.Utils.idealWidth/5)) {
             this.get('level').get('scene').outOfView();
           }
-          else{  
+          else{
             Bird.fly();
             Bird.updateTarget();
           }
         }
         var morph;
-        var morphs = Scene.morphs;  
+        var morphs = Scene.morphs;
         for ( var i = 0; i < morphs.length; i ++ ) {
           morph = morphs[ i ];
           morph.updateAnimation( 1000 * delta );
@@ -293,6 +293,7 @@ window.app = window.app || {};
     },
     end: function(){
       this.pause();
+      window.onbeforeunload = null;
       $('#canvas').css('display', 'none');
       $('.highscores').css('display', '');
       var ender = new app.Views.Endgame();

@@ -1,5 +1,5 @@
 body {
-  background:#FFFFFF;
+  background-image: url('../images/soft-back.jpg');
   color:#fff;
   padding:0;
   margin:0;
@@ -67,7 +67,14 @@ body {
   color:green;
 }
 .highscores{
-  background-color: green;
+  background-color: #ccc;
+  color: #444;
+  font-size: 20px;
+  font-weight: bold;
+  width: 40%;
+  margin:0 auto;
+  border-radius: 15px;
+  font-family: Copperplate, "Copperplate Gothic Light", fantasy;;
 }
 .Inbetween{
   color:orange;
@@ -76,9 +83,12 @@ body {
   width: 40%;
 }
 .gameover{
-  background-color:red;
-  color: white;
-  width:100%;
+  background-image:url('../images/city-duck.jpeg');
+  background-size: cover;
+  color: black;
+  font-size:40px;
+  vertical-align: middle;
+  width:600px;
   height:400px;
   margin:0 auto;
 }
