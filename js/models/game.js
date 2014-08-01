@@ -4,7 +4,8 @@ window.app = window.app || {};
   App.Models.Game = Backbone.Model.extend({
     defaults:{
       levels: [],
-      updateUI: true
+      updateUI: true,
+      muted: false
     },
     setEventListeners: function() {
       document.getElementById('canvas').onmousedown = this.onMouseDown.bind(this);
@@ -178,27 +179,27 @@ window.app = window.app || {};
               alert('You\'re a weinner!')
               app.game.end();
             }else{
-            var levels = this.get('levels');
-            this.set('level', levels.pop());
-            var level = this.get('level');
-            if(levels.length == 0)
-              levels.push(new app.Models.Level({
-                number: level.get('number') + 1,
-                velocity:{
-                  x: level.get('velocity').x + 0.05,
-                  y: level.get('velocity').y + 0.05,
-                  z: level.get('velocity').z + 0.05
-                },
-                maxDistance: level.get('maxDistance') + 5,
-                numberBirds: level.get('numberBirds'),
-                skyColor: 0xFFFFFF * Math.random()
-              }));
+              var levels = this.get('levels');
+              this.set('level', levels.pop());
+              var level = this.get('level');
+              if(levels.length == 0)
+                levels.push(new app.Models.Level({
+                  number: level.get('number') + 1,
+                  velocity:{
+                    x: level.get('velocity').x + 0.05,
+                    y: level.get('velocity').y + 0.05,
+                    z: level.get('velocity').z + 0.05
+                  },
+                  maxDistance: level.get('maxDistance') + 5,
+                  numberBirds: level.get('numberBirds'),
+                  skyColor: 0xFFFFFF * Math.random()
+                }));
 
-            this.get('level').start();
-            this.get('player').reload();
-            this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
-            this.resume();
-          }
+              this.get('level').start();
+              this.get('player').reload();
+              this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
+              this.resume();
+            }
           }.bind(_this)
         });
         $('.inbetween').html(inbetweenLevels.render().el);
@@ -232,9 +233,11 @@ window.app = window.app || {};
       e.preventDefault();
       var audio;
       if(this.get('player').clipEmpty()){
-        audio = document.getElementById('empty');
-        audio.load();
-        audio.play();
+        if(!this.get('muted')){
+          audio = document.getElementById('empty');
+          audio.load();
+          audio.play();
+        }
         return
       }
       this.get('level').get('scene').flash();

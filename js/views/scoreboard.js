@@ -4,7 +4,8 @@ window.app = window.app || {};
   App.Views.Scoreboard = Backbone.View.extend({
     template: JST['scoreboard'],
     events:{
-      'click input.p-button': 'pause'
+      'click input.p-button': 'pause',
+      'click input.m-button': 'mute'
     },
     initialize: function(options) {
       this.options = options;
@@ -30,6 +31,12 @@ window.app = window.app || {};
         app.game.resume();
         this.paused = false
       }
+    },
+    mute: function() {
+      if(app.game.get('muted'))
+        app.game.set('muted', false)
+      else
+        app.game.set('muted', true)
     }
   });
 })(app, Backbone, jQuery)

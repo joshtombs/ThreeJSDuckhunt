@@ -8,20 +8,24 @@ window.app = window.app || {}
       'bullets':6
     },
     reload: function(){
-      var audio;
-      audio = document.getElementById('reload');
-      audio.load();
-      audio.play();
-      this.set('bullets', 6); 
+      if(!app.game.get('muted')){
+        var audio;
+        audio = document.getElementById('reload');
+        audio.load();
+        audio.play();
+      }
+      this.set('bullets', 6);
     },
     shoot: function(){
-      var audio;
-      audio = document.getElementById('fired');
-      audio.load();
-      audio.play();
+      if(!app.game.get('muted')){
+        var audio;
+        audio = document.getElementById('fired');
+        audio.load();
+        audio.play();
+      }
       this.set('bullets', Math.max((this.get('bullets')-1), 0));
     },
-    clipEmpty: function(){ 
+    clipEmpty: function(){
       return !Boolean(this.get('bullets'))
     },
     incrementScoreBy: function(num){
