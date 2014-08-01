@@ -38,4 +38,8 @@ function init() {
   });
   info.render();
   document.getElementById('namebox').focus();
+  window.onbeforeunload = confirmExit;
+  function confirmExit(){
+    return "If you leave now your score will be lost!"
+  }
 }

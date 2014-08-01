@@ -178,7 +178,22 @@ window.app = window.app || {};
               alert('You\'re a weinner!')
               app.game.end();
             }else{
-            this.set('level', this.get('levels').pop());
+            var levels = this.get('levels');
+            this.set('level', levels.pop());
+            var level = this.get('level');
+            if(levels.length == 0)
+              levels.push(new app.Models.Level({
+                number: level.get('number') + 1,
+                velocity:{
+                  x: level.get('velocity').x + 0.05,
+                  y: level.get('velocity').y + 0.05,
+                  z: level.get('velocity').z + 0.05
+                },
+                maxDistance: level.get('maxDistance') + 5,
+                numberBirds: level.get('numberBirds'),
+                skyColor: 0xFFFFFF * Math.random()
+              }));
+
             this.get('level').start();
             this.get('player').reload();
             this.listenTo( this.get('level'), "change:birdsShot", this.updateLevel);
